@@ -7,5 +7,6 @@ class WeatherAPI {
 
         const val BASE = "https://api.openweathermap.org/data/2.5/"
         const val KEY = "b016ea25b2f8daca52324260f8776eea"
+        //const val EXCLUDE = "daily"
     }
 }

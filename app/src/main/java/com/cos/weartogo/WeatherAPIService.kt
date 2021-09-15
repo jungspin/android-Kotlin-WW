@@ -1,7 +1,8 @@
 package com.cos.weartogo
 
 
-import com.cos.weartogo.weatherdata.WeatherData
+import com.cos.weartogo.data.weatherLatLng.WeatherLatLng
+import com.cos.weartogo.data.weatherCity.WeatherData
 import retrofit2.Call
 import retrofit2.http.GET
 
@@ -18,6 +19,11 @@ interface WeatherAPIService {
 
     @GET("weather")
     fun getWeatherAPI(@Query("q") q: String, @Query("appid") appid: String): Call<WeatherData>
+
+    @GET("weather")
+    fun getWeatherLngLat(@Query("lat") lat: Double,
+                         @Query("lon") lon: Double,
+                         @Query("appid") appid: String) : Call<WeatherLatLng>
 
 
 

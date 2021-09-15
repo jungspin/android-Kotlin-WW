@@ -1,4 +1,4 @@
-package com.cos.weartogo.weatherdata
+package com.cos.weartogo.data.weatherCity
 
 data class Wind(
     val deg: Int,

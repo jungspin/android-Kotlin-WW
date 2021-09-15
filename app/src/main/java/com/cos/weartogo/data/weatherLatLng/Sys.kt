@@ -1,4 +1,4 @@
-package com.cos.weartogo.weatherdata
+package com.cos.weartogo.data.weatherLatLng
 
 data class Sys(
     val country: String,
