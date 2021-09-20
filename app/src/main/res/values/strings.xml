@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">WearToGo</string>
+    <string name="description_4">패딩, 두꺼운 코트, 목도리, 기모제품</string>
+    <string name="description_5">코트, 가죽자켓, 히트텍, 니트, 레깅스</string>
+    <string name="description_9">자켓, 트렌치코트, 야상, 니트, 청바지, 스타킹</string>
+    <string name="description_12">자켓, 가디건, 야상, 스타킹, 청바지, 면바지</string>
+    <string name="description_17">얇은 니트, 맨투맨, 가디건, 청바지</string>
+    <string name="description_20">얇은 가디건, 긴팔, 면바지, 청바지</string>
+    <string name="description_23">반팔, 얇은 셔츠, 반바지, 면바지</string>
+    <string name="description_28">민소매, 반팔, \n 반바지, 원피스</string>
 </resources>

@@ -23,7 +23,8 @@ interface WeatherAPIService {
     @GET("weather")
     fun getWeatherLngLat(@Query("lat") lat: Double,
                          @Query("lon") lon: Double,
-                         @Query("appid") appid: String) : Call<WeatherLatLng>
+                         @Query("appid") appid: String,
+                         @Query("lang")lang: String) : Call<WeatherLatLng>
 
 
 
