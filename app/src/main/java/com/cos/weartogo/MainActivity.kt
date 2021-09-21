@@ -1,9 +1,12 @@
  package com.cos.weartogo
 
 import android.Manifest
+import android.app.Activity
 import android.content.Context
+import android.content.IntentSender
 import android.content.pm.PackageManager
 import android.location.Location
+import android.location.LocationListener
 import android.location.LocationManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -20,6 +23,8 @@ import com.cos.weartogo.data.weatherCity.WeatherData
 import com.cos.weartogo.data.weatherLatLng.WeatherLatLng
 import com.cos.weartogo.databinding.ActivityMainBinding
 import com.cos.weartogo.viewmodel.MainViewModel
+import com.google.android.gms.common.api.GoogleApiClient
+import com.google.android.gms.location.*
 
 import retrofit2.Call
 import retrofit2.Callback
@@ -42,6 +47,20 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mainViewModel: MainViewModel
     private val mLocation = CustomLocation(mContext)
 
+    // test ======================
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private var context: Context? = null
+    private var locationCallback: LocationCallback? = null
+    private var locationRequest: LocationRequest? = null
+    private var googleApiClient: GoogleApiClient? = null
+    private var LOCATION_SETTING_REQUEST_CODE = 1000
+
+    private var locationManager: LocationManager? = null
+    private val REQUEST_CODE_LOCATION = 2
+
+
+    var currentLocation: Location? = null
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,8 +73,18 @@ class MainActivity : AppCompatActivity() {
         initSetting()
         initData()
 
+        // test =====
+//        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+//        getCurrentLocation()
 
 
+
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d(TAG, "onResume: ")
+        mLocation.updateLocation()
     }
 
     private fun initLr() {
@@ -208,34 +237,215 @@ class MainActivity : AppCompatActivity() {
     private fun setInfo(temp: Double){
         if (temp >= 28.0){
             binding.tvInfo1.text = getString(R.string.description_28)
+            binding.ivInfo1.setImageResource(R.drawable.ic_sleeve)
+            binding.ivInfo2.setImageResource(R.drawable.ic_half_pants)
+            binding.ivInfo3.setImageResource(R.drawable.ic_half_sleeve)
         }
         when (temp) {
             in 23.0..27.0 ->{
                 binding.tvInfo1.text = getString(R.string.description_23)
-                binding.ivInfo1.setImageResource(R.drawable.ic_long_sleeve)
-                binding.ivInfo2.setImageResource(R.drawable.ic_cotton_pants)
-                binding.ivInfo3.setImageResource(R.drawable.ic_light_cardigan)
+                binding.ivInfo1.setImageResource(R.drawable.ic_half_sleeve)
+                binding.ivInfo2.setImageResource(R.drawable.ic_half_pants)
+                binding.ivInfo3.setImageResource(R.drawable.ic_light_shirt)
             }
             in 20.0..22.0 ->{
                 binding.tvInfo1.text = getString(R.string.description_20)
+                binding.ivInfo1.setImageResource(R.drawable.ic_light_cardigan)
+                binding.ivInfo2.setImageResource(R.drawable.ic_cotton_pants)
+                binding.ivInfo3.setImageResource(R.drawable.ic_long_sleeve)
             }
             in 17.0..19.0 -> {
                 binding.tvInfo1.text = getString(R.string.description_17)
+                binding.ivInfo1.setImageResource(R.drawable.ic_light_knit)
+                binding.ivInfo2.setImageResource(R.drawable.ic_jean)
+                binding.ivInfo3.setImageResource(R.drawable.ic_mtm)
             }
             in 12.0..16.0 ->{
                 binding.tvInfo1.text = getString(R.string.description_12)
+                binding.ivInfo1.setImageResource(R.drawable.ic_jacket_2)
+                binding.ivInfo2.setImageResource(R.drawable.ic_jean)
+                binding.ivInfo3.setImageResource(R.drawable.ic_cardigan)
             }
             in 9.0..11.0 ->{
                 binding.tvInfo1.text = getString(R.string.description_9)
+                binding.ivInfo1.setImageResource(R.drawable.ic_jacket_2)
+                binding.ivInfo2.setImageResource(R.drawable.ic_coat)
+                binding.ivInfo3.setImageResource(R.drawable.ic_knit)
             }
             in 5.0..8.0 ->{
                 binding.tvInfo1.text = getString(R.string.description_5)
+                binding.ivInfo1.setImageResource(R.drawable.ic_knit)
+                binding.ivInfo2.setImageResource(R.drawable.ic_coat)
+                binding.ivInfo3.setImageResource(R.drawable.ic_jacket)
             }
         }
         if (temp <= 4.0){
             binding.tvInfo1.text = getString(R.string.description_4)
+            binding.ivInfo1.setImageResource(R.drawable.ic_safari)
+            binding.ivInfo2.setImageResource(R.drawable.ic_hat)
+            binding.ivInfo3.setImageResource(R.drawable.ic_muffler)
         }
     }
 
+    fun updateLocation(): Location?{
+        Log.d(TAG, "updateLocation: 함수때려짐")
+        if (ActivityCompat.checkSelfPermission(
+                mContext,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                mContext,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            Log.d(TAG, "getMyLocation: 권한 부여 되지 않음")
+            ActivityCompat.requestPermissions(
+                mContext as Activity, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
+                REQUEST_CODE_LOCATION
+            )
+        } else {
+            Log.d(TAG, "getMyLocation: 권한 부여됨")
 
-}
+            // 수동으로 위치 구하기
+            locationManager = mContext.getSystemService(AppCompatActivity.LOCATION_SERVICE) as LocationManager
+
+            locationManager = mContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+
+
+            locationManager!!.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 10F, gpsLocationListener)
+            locationManager!!.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 10F, gpsLocationListener)
+
+        }
+        return currentLocation
+
+    }
+
+    private var gpsLocationListener: LocationListener = object : LocationListener {
+        override fun onLocationChanged(location: Location) {
+            val latitude = location.latitude
+            val longitude = location.longitude
+            val msg = "New Latitude: " + latitude + "New Longitude: " + longitude
+            Log.d(TAG, "onLocationChanged: $msg")
+            mainViewModel.getWeatherLatLng(latitude, longitude, WeatherAPI.KEY, WeatherAPI.LANG)
+            mainViewModel.getValue.observe(this@MainActivity, Observer {
+                if(it != null) {
+
+                    // 현재 온도
+                    var temp = getRealTemp(it?.main?.feels_like)
+                    binding.tvTemp.text = "$temp °C"
+                    // 옷 정보 설정
+                    setInfo(temp)
+                    // 날씨 아이콘 설정
+                    setCodeToImg(it?.weather?.get(0)?.id)
+                    // 날씨 설명
+                    binding.tvDescription.text = it?.weather?.get(0)?.description
+                    // 현재 시간
+                    val sdf = SimpleDateFormat("hh시 mm분")
+                    binding.tvTime.text = "${sdf.format(System.currentTimeMillis())}"
+
+
+                }
+            })
+        }
+
+        override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
+
+    }
+
+    // test ======
+
+//    fun getCurrentLocation() {
+//        // Get Current location and do reverse geocoding
+//
+//        locationCallback = object : LocationCallback() {
+//            override fun onLocationResult(locationResult: LocationResult?) {
+//                locationResult ?: return
+//
+//                try {
+//                    for (location in locationResult.locations) {
+//                        // here you get current lat ,long,etc value..
+//                        stopLocationUpdates()
+//                    } // for
+//
+//
+//                } catch (e: Exception) {
+//                    e.printStackTrace()
+//                    stopLocationUpdates()
+//                } //catch
+//            }
+//        }
+//
+//     locationRequest = LocationRequest().apply {
+//         interval = 10000
+//         fastestInterval = 5000
+//         priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+//     }
+//     startLocationUpdates()
+//    }
+//
+//    private fun startLocationUpdates() {
+//        googleApiClient = GoogleApiClient.Builder(this)
+//            .addApi(LocationServices.API)
+//            .build()
+//        googleApiClient!!.connect()
+//        val builder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest!!)
+//        builder.setAlwaysShow(true)
+//        val result = LocationServices.SettingsApi.checkLocationSettings(googleApiClient, builder.build())
+//        result.setResultCallback { result ->
+//            val status = result.status
+//            when (status.statusCode) {
+//                LocationSettingsStatusCodes.SUCCESS -> {
+//                    Log.i(TAG, "All location settings are satisfied.")
+//                    if (ActivityCompat.checkSelfPermission(
+//                            this,
+//                            Manifest.permission.ACCESS_FINE_LOCATION
+//                        ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+//                            this,
+//                            Manifest.permission.ACCESS_COARSE_LOCATION
+//                        ) != PackageManager.PERMISSION_GRANTED
+//                    ) {
+//
+//                    }
+//                    fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null)
+//                }
+//                LocationSettingsStatusCodes.RESOLUTION_REQUIRED -> {
+//                    Log.i(TAG, "Location settings are not satisfied. Show the user a dialog to upgrade location settings ")
+//                    try {
+//                        // Show the dialog by calling startResolutionForResult(), and check the result
+//                        // in onActivityResult().
+//                        status.startResolutionForResult(this, LOCATION_SETTING_REQUEST_CODE)
+//                    } catch (e: IntentSender.SendIntentException) {
+//                        Log.i(TAG, "PendingIntent unable to execute request.")
+//                    }
+//                }
+//                LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE -> Log.i(TAG, "Location settings are inadequate, and cannot be fixed here. Dialog not created.")
+//            }
+//        }
+//    }
+//
+//    private fun stopLocationUpdates() {
+//        if (locationCallback != null) {
+//            fusedLocationClient?.removeLocationUpdates(locationCallback)
+//        }
+//    }
+//    override fun onStop() {
+//        super.onStop()
+//        stopLocationUpdates()
+//    }
+//    override fun onPause() {
+//        super.onPause()
+//        stopLocationUpdates()
+//    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d(TAG, "onStop: ")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.d(TAG, "onPause: ")
+    }
+
+
+
+} // onCreate
