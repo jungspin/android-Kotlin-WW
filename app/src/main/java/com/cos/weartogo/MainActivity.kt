@@ -3,7 +3,6 @@
 import android.Manifest
 import android.app.Activity
 import android.content.Context
-import android.content.IntentSender
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
@@ -23,8 +22,7 @@ import com.cos.weartogo.data.weatherCity.WeatherData
 import com.cos.weartogo.data.weatherLatLng.WeatherLatLng
 import com.cos.weartogo.databinding.ActivityMainBinding
 import com.cos.weartogo.viewmodel.MainViewModel
-import com.google.android.gms.common.api.GoogleApiClient
-import com.google.android.gms.location.*
+
 
 import retrofit2.Call
 import retrofit2.Callback
@@ -47,13 +45,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mainViewModel: MainViewModel
     private val mLocation = CustomLocation(mContext)
 
-    // test ======================
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private var context: Context? = null
-    private var locationCallback: LocationCallback? = null
-    private var locationRequest: LocationRequest? = null
-    private var googleApiClient: GoogleApiClient? = null
-    private var LOCATION_SETTING_REQUEST_CODE = 1000
 
     private var locationManager: LocationManager? = null
     private val REQUEST_CODE_LOCATION = 2
@@ -81,11 +72,48 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    override fun onResume() {
-        super.onResume()
-        Log.d(TAG, "onResume: ")
-        mLocation.updateLocation()
+    // 좌표 구하기 =======================================================
+    fun getMyLocation(): Location? {
+        // Register the listener with the Location Manager to receive location updates
+        if (ActivityCompat.checkSelfPermission(
+                mContext,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                mContext,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            Log.d(TAG, "getMyLocation: 권한 부여 되지 않음")
+            ActivityCompat.requestPermissions(
+                mContext as Activity, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
+                REQUEST_CODE_LOCATION
+            )
+            getMyLocation()
+        } else {
+            Log.d(TAG, "getMyLocation: 권한 부여됨")
+
+
+            // 수동으로 위치 구하기
+            locationManager = mContext.getSystemService(LOCATION_SERVICE) as LocationManager
+
+            currentLocation = locationManager!!.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+            if (currentLocation != null) {
+                val lng = currentLocation!!.longitude
+                val lat = currentLocation!!.latitude
+                Log.d(TAG, "GPS_PROVIDER: $lat, $lng")
+                locationManager!!.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 100F, gpsLocationListener)
+            } else {
+                currentLocation = locationManager!!.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
+                val lng = currentLocation!!.longitude
+                val lat = currentLocation!!.latitude
+                Log.d(TAG, "NETWORK_PROVIDER: $lat, $lng")
+                locationManager!!.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 100F, gpsLocationListener)
+            }
+        }
+        return currentLocation
     }
+
+
 
     private fun initLr() {
         binding.svSearch.setOnQueryTextListener(object: SearchView.OnQueryTextListener,
@@ -197,6 +225,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+
+
     private fun getRealTemp(temp: Double): Double {
         var c = temp - 273.15
         return floor(c)
@@ -287,37 +317,37 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun updateLocation(): Location?{
-        Log.d(TAG, "updateLocation: 함수때려짐")
-        if (ActivityCompat.checkSelfPermission(
-                mContext,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                mContext,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            Log.d(TAG, "getMyLocation: 권한 부여 되지 않음")
-            ActivityCompat.requestPermissions(
-                mContext as Activity, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
-                REQUEST_CODE_LOCATION
-            )
-        } else {
-            Log.d(TAG, "getMyLocation: 권한 부여됨")
-
-            // 수동으로 위치 구하기
-            locationManager = mContext.getSystemService(AppCompatActivity.LOCATION_SERVICE) as LocationManager
-
-            locationManager = mContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-
-
-            locationManager!!.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 10F, gpsLocationListener)
-            locationManager!!.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 10F, gpsLocationListener)
-
-        }
-        return currentLocation
-
-    }
+//    fun updateLocation(): Location?{
+//        Log.d(TAG, "updateLocation: 함수때려짐")
+//        if (ActivityCompat.checkSelfPermission(
+//                mContext,
+//                Manifest.permission.ACCESS_FINE_LOCATION
+//            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+//                mContext,
+//                Manifest.permission.ACCESS_COARSE_LOCATION
+//            ) != PackageManager.PERMISSION_GRANTED
+//        ) {
+//            Log.d(TAG, "getMyLocation: 권한 부여 되지 않음")
+//            ActivityCompat.requestPermissions(
+//                mContext as Activity, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
+//                REQUEST_CODE_LOCATION
+//            )
+//        } else {
+//            Log.d(TAG, "getMyLocation: 권한 부여됨")
+//
+//            // 수동으로 위치 구하기
+//            locationManager = mContext.getSystemService(AppCompatActivity.LOCATION_SERVICE) as LocationManager
+//
+//            locationManager = mContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+//
+//
+//            locationManager!!.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 10F, gpsLocationListener)
+//            locationManager!!.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 10F, gpsLocationListener)
+//
+//        }
+//        return currentLocation
+//
+//    }
 
     private var gpsLocationListener: LocationListener = object : LocationListener {
         override fun onLocationChanged(location: Location) {
@@ -351,90 +381,6 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    // test ======
-
-//    fun getCurrentLocation() {
-//        // Get Current location and do reverse geocoding
-//
-//        locationCallback = object : LocationCallback() {
-//            override fun onLocationResult(locationResult: LocationResult?) {
-//                locationResult ?: return
-//
-//                try {
-//                    for (location in locationResult.locations) {
-//                        // here you get current lat ,long,etc value..
-//                        stopLocationUpdates()
-//                    } // for
-//
-//
-//                } catch (e: Exception) {
-//                    e.printStackTrace()
-//                    stopLocationUpdates()
-//                } //catch
-//            }
-//        }
-//
-//     locationRequest = LocationRequest().apply {
-//         interval = 10000
-//         fastestInterval = 5000
-//         priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-//     }
-//     startLocationUpdates()
-//    }
-//
-//    private fun startLocationUpdates() {
-//        googleApiClient = GoogleApiClient.Builder(this)
-//            .addApi(LocationServices.API)
-//            .build()
-//        googleApiClient!!.connect()
-//        val builder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest!!)
-//        builder.setAlwaysShow(true)
-//        val result = LocationServices.SettingsApi.checkLocationSettings(googleApiClient, builder.build())
-//        result.setResultCallback { result ->
-//            val status = result.status
-//            when (status.statusCode) {
-//                LocationSettingsStatusCodes.SUCCESS -> {
-//                    Log.i(TAG, "All location settings are satisfied.")
-//                    if (ActivityCompat.checkSelfPermission(
-//                            this,
-//                            Manifest.permission.ACCESS_FINE_LOCATION
-//                        ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-//                            this,
-//                            Manifest.permission.ACCESS_COARSE_LOCATION
-//                        ) != PackageManager.PERMISSION_GRANTED
-//                    ) {
-//
-//                    }
-//                    fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null)
-//                }
-//                LocationSettingsStatusCodes.RESOLUTION_REQUIRED -> {
-//                    Log.i(TAG, "Location settings are not satisfied. Show the user a dialog to upgrade location settings ")
-//                    try {
-//                        // Show the dialog by calling startResolutionForResult(), and check the result
-//                        // in onActivityResult().
-//                        status.startResolutionForResult(this, LOCATION_SETTING_REQUEST_CODE)
-//                    } catch (e: IntentSender.SendIntentException) {
-//                        Log.i(TAG, "PendingIntent unable to execute request.")
-//                    }
-//                }
-//                LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE -> Log.i(TAG, "Location settings are inadequate, and cannot be fixed here. Dialog not created.")
-//            }
-//        }
-//    }
-//
-//    private fun stopLocationUpdates() {
-//        if (locationCallback != null) {
-//            fusedLocationClient?.removeLocationUpdates(locationCallback)
-//        }
-//    }
-//    override fun onStop() {
-//        super.onStop()
-//        stopLocationUpdates()
-//    }
-//    override fun onPause() {
-//        super.onPause()
-//        stopLocationUpdates()
-//    }
 
     override fun onStop() {
         super.onStop()

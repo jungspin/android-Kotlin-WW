@@ -8,13 +8,14 @@ import android.location.*
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import java.text.SimpleDateFormat
 
 
 private const val TAG = "CustomLocation"
-class CustomLocation(private val mContext: Context) {
+class CustomLocation(private val mContext: Context): AppCompatActivity() {
 
     private var locationManager: LocationManager? = null
     private val REQUEST_CODE_LOCATION = 2
@@ -24,8 +25,6 @@ class CustomLocation(private val mContext: Context) {
 
     // 좌표 구하기 =======================================================
     fun getMyLocation(): Location? {
-        Log.d(TAG, "getMyLocation: 함수 때려짐")
-
         // Register the listener with the Location Manager to receive location updates
         if (ActivityCompat.checkSelfPermission(
                 mContext,
@@ -44,23 +43,47 @@ class CustomLocation(private val mContext: Context) {
         } else {
             Log.d(TAG, "getMyLocation: 권한 부여됨")
 
+
             // 수동으로 위치 구하기
-            locationManager = mContext.getSystemService(AppCompatActivity.LOCATION_SERVICE) as LocationManager
+            locationManager = mContext.getSystemService(LOCATION_SERVICE) as LocationManager
 
             currentLocation = locationManager!!.getLastKnownLocation(LocationManager.GPS_PROVIDER)
             if (currentLocation != null) {
                 val lng = currentLocation!!.longitude
                 val lat = currentLocation!!.latitude
                 Log.d(TAG, "GPS_PROVIDER: $lat, $lng")
+                locationManager!!.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 10F, gpsLocationListener)
             } else {
                 currentLocation = locationManager!!.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
                 val lng = currentLocation!!.longitude
                 val lat = currentLocation!!.latitude
                 Log.d(TAG, "NETWORK_PROVIDER: $lat, $lng")
+                locationManager!!.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 10F, gpsLocationListener)
             }
         }
         return currentLocation
     }
+
+    override fun onRequestPermissionsResult(requestCode: Int,
+                                            permissions: Array<String>, grantResults: IntArray) {
+        Log.d(TAG, "onRequestPermissionsResult: ")
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            REQUEST_CODE_LOCATION -> {
+                // If request is cancelled, the result arrays are empty.
+                if ((grantResults.isNotEmpty() &&
+                            grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                    getMyLocation()
+                } else {
+                    Toast.makeText(mContext, "앱을 사용하기 위해서는 위치 권한이 필요합니다", Toast.LENGTH_SHORT).show()
+                    finish()
+                }
+                return
+            }
+
+        }
+    }
+
 
     fun updateLocation(): Location?{
         Log.d(TAG, "updateLocation: 함수때려짐")
@@ -72,19 +95,16 @@ class CustomLocation(private val mContext: Context) {
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            Log.d(TAG, "getMyLocation: 권한 부여 되지 않음")
+            Log.d(TAG, "updateLocation: 권한 부여 되지 않음")
             ActivityCompat.requestPermissions(
                 mContext as Activity, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
                 REQUEST_CODE_LOCATION
             )
         } else {
-            Log.d(TAG, "getMyLocation: 권한 부여됨")
+            Log.d(TAG, "updateLocation: 권한 부여됨")
 
             // 수동으로 위치 구하기
-            locationManager = mContext.getSystemService(AppCompatActivity.LOCATION_SERVICE) as LocationManager
-
-            locationManager = mContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-
+            locationManager = mContext.getSystemService(LOCATION_SERVICE) as LocationManager
 
             locationManager!!.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 10F, gpsLocationListener)
             //locationManager!!.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 10F, gpsLocationListener)
@@ -98,7 +118,7 @@ class CustomLocation(private val mContext: Context) {
         override fun onLocationChanged(location: Location) {
             val latitude = location.latitude
             val longitude = location.longitude
-            val msg = "New Latitude: " + latitude + "New Longitude: " + longitude
+            val msg = "New Latitude: $latitude New Longitude: $longitude"
             Log.d(TAG, "onLocationChanged: $msg")
 
         }
@@ -197,4 +217,6 @@ class CustomLocation(private val mContext: Context) {
             }
         }
     }
+
+
 }
