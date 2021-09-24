@@ -50,40 +50,5 @@ class MainViewModel() : ViewModel() {
             })
     }
 
-    // 도시 이름으로 날씨 받아오기 ==============================================
-//    private fun getWeatherAPI(city: String) {
-//        val retrofit = Retrofit.Builder()
-//            .baseUrl(WeatherAPI.BASE)
-//            .addConverterFactory(GsonConverterFactory.create())
-//            .build()
-//
-//        val weatherAPIService = retrofit.create(WeatherAPIService::class.java)
-//
-//        weatherAPIService
-//            .getWeatherAPI(city, WeatherAPI.KEY)
-//            .enqueue(object : Callback<WeatherData> {
-//                override fun onResponse(call: Call<WeatherData>, response: Response<WeatherData>) {
-//                    Log.d(TAG, "onResponse: $response")
-//
-//                    val sdf = SimpleDateFormat("yyyy년 MM월 dd일 hh시 mm분")
-//                    Log.d(TAG, "currentTime: ${sdf.format(System.currentTimeMillis())} ")
-//
-//                    var main = response.body()?.main
-//                    if (main != null) {
-//
-//                        binding.tvCity.text = city
-//                        binding.tvMax.text = "현재 온도 : ${getRealTemp(main.temp)}"
-//                        binding.tvMin.text = "체감 온도 : ${getRealTemp(main.feels_like)}"
-//                    }
-//
-//                }
-//
-//                override fun onFailure(call: Call<WeatherData>, t: Throwable) {
-//                    t.printStackTrace()
-//                }
-//
-//            })
-//
-//    }
 
 }

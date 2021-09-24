@@ -15,6 +15,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.cos.weartogo.R
+import com.cos.weartogo.config.CustomLocation
 import com.cos.weartogo.config.WeatherAPI
 import com.cos.weartogo.databinding.ActivityMainBinding
 import com.cos.weartogo.viewmodel.MainViewModel
@@ -35,8 +37,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var getResult: ActivityResultLauncher<Intent>
 
-    private var progressBar: ProgressBar? = null
-    private val handler = Handler(Looper.getMainLooper()) // 그냥 Handler() 는 deprecated
+//    private var progressBar: ProgressBar? = null
+//    private val handler = Handler(Looper.getMainLooper()) // 그냥 Handler() 는 deprecated
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -17,11 +17,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.WearToGo"
         android:usesCleartextTraffic="true">
-        <activity android:name=".SearchActivity"
+        <activity android:name=".view.SearchActivity"
             android:theme="@style/Theme.AppCompat.Light.Dialog.MinWidth"></activity>
         <activity android:name=".config.ProgressDialogActivity" />
-        <activity android:name=".TestActivity" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".view.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

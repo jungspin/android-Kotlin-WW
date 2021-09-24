@@ -10,3 +10,10 @@
 * kotlin
 ## 사용 API 
 * [OpenWeather](https://openweathermap.org/current)
+
+## 아이콘 출처
+### 날씨 아이콘
+Icons made by <a href="https://www.flaticon.com/authors/iconixar" title="iconixar">iconixar</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a>
+
+### 의류 아이콘
+<a href="https://kr.pixtastock.com/">이미지 콘텐츠</a>：PIXTA (픽스타) 
