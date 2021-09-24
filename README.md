@@ -3,10 +3,10 @@
 
 [개발일지](https://jungspin.notion.site/WearToGo-f104b50ccb124b819d93f13d8afd88b9)
 
-###메인화면
-![Screenshot_20210924-011917_WearToGo](https://user-images.githubusercontent.com/79776712/134619396-7ff0b43c-5b9b-4ba7-9f19-df034941914c.jpg)
+## 메인화면
+![image](https://user-images.githubusercontent.com/79776712/134620009-e8e9673f-1a45-4f5c-9f0a-51b30d1315da.png)
 
-###사용언어
-	* kotlin
-###사용 API 
-	* [OpenWeather](https://openweathermap.org/current)
+## 사용언어
+* kotlin
+## 사용 API 
+* [OpenWeather](https://openweathermap.org/current)
