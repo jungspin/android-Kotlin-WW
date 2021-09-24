@@ -1,20 +1,17 @@
 package com.cos.weartogo.viewmodel
 
 import android.util.Log
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.cos.weartogo.R
 
-import com.cos.weartogo.WeatherAPI
-import com.cos.weartogo.WeatherAPIService
+import com.cos.weartogo.config.WeatherAPI
+import com.cos.weartogo.service.WeatherAPIService
 import com.cos.weartogo.data.weatherLatLng.WeatherLatLng
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.text.SimpleDateFormat
 
 private const val TAG = "MainViewModel"
 
@@ -39,20 +36,17 @@ class MainViewModel() : ViewModel() {
 
         val weatherAPIService = retrofit.create(WeatherAPIService::class.java)
         weatherAPIService
-            .getWeatherLngLat(lat, lng, appid, lang)
+            .getWeatherLatLng(lat, lng, appid, lang)
             .enqueue(object : Callback<WeatherLatLng> {
                 override fun onResponse(
                     call: Call<WeatherLatLng>,
                     response: Response<WeatherLatLng>
                 ) {
-
                     weatherLatLng.value = response.body()
                 }
-
                 override fun onFailure(call: Call<WeatherLatLng>, t: Throwable) {
                     Log.d(TAG, "onFailure: 실패")
                 }
-
             })
     }
 

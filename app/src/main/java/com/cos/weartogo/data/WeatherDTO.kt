@@ -1,4 +1,4 @@
-package com.cos.weartogo
+package com.cos.weartogo.data
 
 data class WeatherDTO (
     var taMin: Int = 0,

@@ -1,4 +1,4 @@
-package com.cos.weartogo
+package com.cos.weartogo.config
 
 import android.Manifest
 import android.app.Activity
@@ -42,7 +42,6 @@ class CustomLocation(private val mContext: Context): AppCompatActivity() {
             getMyLocation()
         } else {
             Log.d(TAG, "getMyLocation: 권한 부여됨")
-
 
             // 수동으로 위치 구하기
             locationManager = mContext.getSystemService(LOCATION_SERVICE) as LocationManager

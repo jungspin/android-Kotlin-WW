@@ -1,4 +1,4 @@
-package com.cos.weartogo
+package com.cos.weartogo.view
 
 import android.content.Context
 import android.content.Intent
@@ -21,6 +21,11 @@ class SearchActivity : AppCompatActivity() {
         binding = ActivitySearchBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        initLr()
+
+    }
+
+    private fun initLr(){
         binding.svSearch.setOnQueryTextListener(object: SearchView.OnQueryTextListener{
             override fun onQueryTextSubmit(p0: String?): Boolean {
 
@@ -33,12 +38,10 @@ class SearchActivity : AppCompatActivity() {
                 }
                 return false
             }
-
             override fun onQueryTextChange(p0: String?): Boolean {
                 //Log.d(TAG, "onQueryTextChange: ")
                 return false
             }
-
         })
     }
 }

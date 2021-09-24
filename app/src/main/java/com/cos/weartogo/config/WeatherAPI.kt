@@ -1,4 +1,4 @@
-package com.cos.weartogo
+package com.cos.weartogo.config
 
 class WeatherAPI {
     companion object{

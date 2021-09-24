@@ -1,4 +1,4 @@
-package com.cos.weartogo
+package com.cos.weartogo.service
 
 
 import com.cos.weartogo.data.weatherLatLng.WeatherLatLng
@@ -21,7 +21,7 @@ interface WeatherAPIService {
     fun getWeatherAPI(@Query("q") q: String, @Query("appid") appid: String): Call<WeatherData>
 
     @GET("weather")
-    fun getWeatherLngLat(@Query("lat") lat: Double,
+    fun getWeatherLatLng(@Query("lat") lat: Double,
                          @Query("lon") lon: Double,
                          @Query("appid") appid: String,
                          @Query("lang")lang: String) : Call<WeatherLatLng>

@@ -11,6 +11,11 @@
     tools:context=".MainActivity">
 
 
+<!--    <ProgressBar-->
+<!--        android:id="@+id/progressBar"-->
+<!--        android:layout_height="73dp"-->
+<!--        android:layout_width="match_parent"-->
+<!--        style="?android:attr/progressBarStyleHorizontal" />-->
 
 
     <TextView

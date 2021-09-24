@@ -1,43 +1,26 @@
- package com.cos.weartogo
+ package com.cos.weartogo.view
 
-import android.Manifest
-import android.app.Activity
-import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.location.Location
-import android.location.LocationListener
-import android.location.LocationManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.View
-import android.widget.SearchView
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import androidx.core.view.get
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.cos.weartogo.data.weatherCity.WeatherData
-import com.cos.weartogo.data.weatherLatLng.WeatherLatLng
+import com.cos.weartogo.config.WeatherAPI
 import com.cos.weartogo.databinding.ActivityMainBinding
 import com.cos.weartogo.viewmodel.MainViewModel
 
 
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import java.text.SimpleDateFormat
 import kotlin.math.floor
-import kotlin.properties.Delegates
 
  private const val TAG = "MainActivity2"
 
@@ -52,10 +35,12 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var getResult: ActivityResultLauncher<Intent>
 
-    private var SHOW_DESC_CODE = false
+    private var progressBar: ProgressBar? = null
+    private val handler = Handler(Looper.getMainLooper()) // 그냥 Handler() 는 deprecated
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -65,23 +50,28 @@ class MainActivity : AppCompatActivity() {
         initData()
     }
 
+    override fun onResume() {
+        super.onResume()
+
+    }
+
 
 
 
     private fun initLr() {
         binding.ivInfo1.setOnClickListener(View.OnClickListener {
             binding.tvShowDescription.isVisible = true
-            SHOW_DESC_CODE = true
+
             binding.tvInfoClick.isVisible = false
         })
         binding.ivInfo2.setOnClickListener(View.OnClickListener {
             binding.tvShowDescription.isVisible = true
-            SHOW_DESC_CODE = true
+
             binding.tvInfoClick.isVisible = false
         })
         binding.ivInfo3.setOnClickListener(View.OnClickListener {
             binding.tvShowDescription.isVisible = true
-            SHOW_DESC_CODE = true
+
             binding.tvInfoClick.isVisible = false
         })
 
@@ -94,7 +84,6 @@ class MainActivity : AppCompatActivity() {
             ActivityResultContracts.StartActivityForResult()
         ) { result ->
             if (result.resultCode == RESULT_OK) {
-                Log.d(TAG, "onCreate: registerForActivityResult")
                 var data = result.data?.getStringExtra("data")
                 Log.d(TAG, "initLr: $data")
                 if (data != null) {
@@ -111,7 +100,6 @@ class MainActivity : AppCompatActivity() {
                         }
                         binding.tvLocation.text = address
                         mainViewModel.getWeatherLatLng(qLat, qLng, WeatherAPI.KEY, WeatherAPI.LANG)
-
                         mainViewModel.getValue.observe(this, Observer {
                             if(it != null) {
 
@@ -160,11 +148,10 @@ class MainActivity : AppCompatActivity() {
                 if (address.contains("null")){
                     address = address.replace("null", "")
                     binding.tvLocation.text = address
+                } else {
+                    binding.tvLocation.text = address
                 }
-                binding.tvLocation.text = address
-
                 mainViewModel.getWeatherLatLng(lat, lng, WeatherAPI.KEY, WeatherAPI.LANG)
-                // 뷰모델이 가지고 있는 값의 변경사항을 관찰할 수 있는 라이브 데이터를 관찰한다
                 mainViewModel.getValue.observe(this, Observer {
                     if(it != null) {
 
@@ -279,68 +266,6 @@ class MainActivity : AppCompatActivity() {
             binding.ivInfo2.setImageResource(R.drawable.ic_hat)
             binding.ivInfo3.setImageResource(R.drawable.ic_muffler)
         }
-    }
-
-//    fun updateLocation(): Location?{
-//        Log.d(TAG, "updateLocation: 함수때려짐")
-//        if (ActivityCompat.checkSelfPermission(
-//                mContext,
-//                Manifest.permission.ACCESS_FINE_LOCATION
-//            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-//                mContext,
-//                Manifest.permission.ACCESS_COARSE_LOCATION
-//            ) != PackageManager.PERMISSION_GRANTED
-//        ) {
-//            Log.d(TAG, "getMyLocation: 권한 부여 되지 않음")
-//            ActivityCompat.requestPermissions(
-//                mContext as Activity, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
-//                REQUEST_CODE_LOCATION
-//            )
-//        } else {
-//            Log.d(TAG, "getMyLocation: 권한 부여됨")
-//
-//            // 수동으로 위치 구하기
-//            locationManager = mContext.getSystemService(AppCompatActivity.LOCATION_SERVICE) as LocationManager
-//
-//            locationManager = mContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-//
-//
-//            locationManager!!.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 10F, gpsLocationListener)
-//            locationManager!!.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 10F, gpsLocationListener)
-//
-//        }
-//        return currentLocation
-//
-//    }
-
-    private var gpsLocationListener: LocationListener = object : LocationListener {
-        override fun onLocationChanged(location: Location) {
-            val latitude = location.latitude
-            val longitude = location.longitude
-            val msg = "New Latitude: " + latitude + "New Longitude: " + longitude
-            Log.d(TAG, "onLocationChanged: $msg")
-            mainViewModel.getWeatherLatLng(latitude, longitude, WeatherAPI.KEY, WeatherAPI.LANG)
-            mainViewModel.getValue.observe(this@MainActivity, Observer {
-                if(it != null) {
-
-                    // 현재 온도
-                    var temp = getRealTemp(it?.main?.feels_like)
-                    binding.tvTemp.text = "$temp °C"
-                    // 옷 정보 설정
-                    setInfo(temp)
-                    // 날씨 아이콘 설정
-                    setCodeToImg(it?.weather?.get(0)?.id)
-                    // 날씨 설명
-                    binding.tvDescription.text = it?.weather?.get(0)?.description
-
-
-
-                }
-            })
-        }
-
-        override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
-
     }
 
 
