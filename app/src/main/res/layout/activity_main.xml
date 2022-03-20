@@ -1,134 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.appcompat.widget.LinearLayoutCompat
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="20dp"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    tools:context=".view.MainActivity">
 
+    <fragment
+        android:id="@+id/nav_host"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:defaultNavHost="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navGraph="@navigation/nav_main" />
 
-<!--    <ProgressBar-->
-<!--        android:id="@+id/progressBar"-->
-<!--        android:layout_height="73dp"-->
-<!--        android:layout_width="match_parent"-->
-<!--        style="?android:attr/progressBarStyleHorizontal" />-->
-
-
-    <TextView
-        android:id="@+id/tvLocation"
-        android:layout_width="wrap_content"
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_nav"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="130dp"
-        android:text="현재위치"
-        android:textSize="30dp"
-        android:gravity="center"
-        android:layout_gravity="center"/>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp">
-
-        <ImageView
-            android:id="@+id/ivWeather"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:layout_gravity="center"
-            android:scaleType="centerCrop"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.135"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_clear" />
-
-        <TextView
-            android:id="@+id/tvTemp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="24dp"
-            android:text="현재온도"
-            android:textSize="40dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.978"
-            app:layout_constraintStart_toStartOf="@+id/ivWeather"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/tvDescription"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="28dp"
-            android:text="날씨설명"
-            android:textSize="20dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/ivWeather"
-            app:layout_constraintTop_toBottomOf="@+id/tvTemp" />
-
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-    <androidx.appcompat.widget.LinearLayoutCompat
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:layout_marginTop="20dp">
-
-        <ImageView
-            android:id="@+id/ivInfo1"
-            android:layout_width="100dp"
-            android:layout_height="100dp"/>
-
-        <ImageView
-            android:id="@+id/ivInfo2"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_marginStart="15dp"/>
+        app:layout_constraintBottom_toBottomOf="@+id/nav_host"
+        app:layout_constraintEnd_toEndOf="@+id/nav_host"
+        app:layout_constraintStart_toStartOf="@+id/nav_host"
+        app:menu="@menu/bottom_navigation_menu" />
 
 
 
-        <ImageView
-            android:id="@+id/ivInfo3"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_marginStart="15dp"/>
 
-
-    </androidx.appcompat.widget.LinearLayoutCompat>
-
-    <TextView
-        android:id="@+id/tvShowDescription"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:textSize="15dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="15dp"/>
-
-    <TextView
-        android:id="@+id/tvInfoClick"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="아이콘을 클릭하면 상세정보를 볼 수 있어요💁‍♀"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="20dp"/>
-
-
-    <Button
-        android:id="@+id/btnSearch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:backgroundTint="?attr/colorPrimaryVariant"
-        android:text="검색하기"/>
-
-
-
-</androidx.appcompat.widget.LinearLayoutCompat>
+</androidx.constraintlayout.widget.ConstraintLayout>

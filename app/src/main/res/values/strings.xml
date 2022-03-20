@@ -8,4 +8,6 @@
     <string name="description_20">얇은 가디건, 긴팔, 면바지, 청바지</string>
     <string name="description_23">반팔, 얇은 셔츠, 반바지, 면바지</string>
     <string name="description_28">민소매, 반팔, 반바지, 원피스</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
