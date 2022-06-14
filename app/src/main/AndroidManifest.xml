@@ -18,6 +18,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.WearToGo"
         android:usesCleartextTraffic="true"
+        android:debuggable="true"
         tools:targetApi="m">
         <activity
             android:name=".view.SearchActivity"
