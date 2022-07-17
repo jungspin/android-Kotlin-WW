@@ -20,6 +20,7 @@
         android:id="@+id/item_wearing_1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:src="@drawable/ic_mtm"
         app:layout_constraintEnd_toStartOf="@+id/item_wearing_2"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintHorizontal_weight="3"
@@ -30,6 +31,8 @@
         android:id="@+id/item_wearing_2"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:src="@drawable/ic_mtm"
+        app:layout_constraintBottom_toBottomOf="@+id/item_wearing_1"
         app:layout_constraintEnd_toStartOf="@+id/item_wearing_3"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintHorizontal_weight="3"
@@ -40,6 +43,8 @@
         android:id="@+id/item_wearing_3"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:src="@drawable/ic_mtm"
+        app:layout_constraintBottom_toBottomOf="@+id/item_wearing_description"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintHorizontal_weight="3"
@@ -51,9 +56,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
+        android:layout_marginTop="8dp"
         android:text="@string/main_weather_helper_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/item_wearing_description" />
+        app:layout_constraintTop_toBottomOf="@+id/item_wearing_1" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

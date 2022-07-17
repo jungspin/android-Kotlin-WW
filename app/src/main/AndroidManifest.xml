@@ -19,11 +19,9 @@
         android:theme="@style/Theme.WearToGo"
         android:usesCleartextTraffic="true"
         android:debuggable="true"
-        tools:targetApi="m">
-        <activity
-            android:name=".view.SearchActivity"
-            android:theme="@style/Theme.AppCompat.Light.Dialog.MinWidth" />
-        <activity android:name=".config.ProgressDialogActivity" />
+        tools:targetApi="m"
+        tools:ignore="HardcodedDebugMode">
+
         <activity android:name=".view.MainActivity"
             android:exported="true">
             <intent-filter>

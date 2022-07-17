@@ -8,10 +8,8 @@ import android.location.*
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import java.text.SimpleDateFormat
 
 
 private const val TAG = "CustomLocation"

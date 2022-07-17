@@ -5,23 +5,27 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.cos.weartogo.R
 import com.cos.weartogo.config.CustomLocation
-import com.cos.weartogo.config.WeatherAPI
 import com.cos.weartogo.databinding.ActivityMainBinding
-import com.cos.weartogo.viewmodel.MainViewModel
+import com.cos.weartogo.viewmodel.CurrentViewModel
+import com.cos.weartogo.viewmodel.ForecastViewModel
 import kotlin.math.floor
 
+private const val TAG = "MainActivity2"
 
 class MainActivity : AppCompatActivity() {
 
+
     private lateinit var binding: ActivityMainBinding
     private val mContext: Context = this
-    private lateinit var mainViewModel: MainViewModel
+    private lateinit var currentViewModel: CurrentViewModel
+    private lateinit var forecastViewModel: ForecastViewModel
     private lateinit var mLocation: CustomLocation
     private lateinit var getResult: ActivityResultLauncher<Intent>
 
@@ -57,60 +61,13 @@ class MainActivity : AppCompatActivity() {
             binding.mainWearingInfo.itemWearing3.visibility = View.VISIBLE
             binding.mainWearingInfo.itemWearingDescription.visibility = View.INVISIBLE
         }
-
-//
-//        binding.btnSearch.setOnClickListener(View.OnClickListener {
-//            val intent = Intent(mContext, SearchActivity::class.java)
-//            getResult.launch(intent)
-//        })
-//
-//        getResult = registerForActivityResult(
-//            ActivityResultContracts.StartActivityForResult()
-//        ) { result ->
-//            if (result.resultCode == AppCompatActivity.RESULT_OK) {
-//                val data = result.data?.getStringExtra("data")
-//                if (data != null) {
-//                    val qLat = mLocation.addressToLatLng(data)?.latitude
-//                    val qLng = mLocation.addressToLatLng(data)?.longitude
-//
-//                    if(qLat != null && qLng != null){
-//                        // 위치 이름 설정
-//                        val addr = mLocation.latLngToAddress(qLat, qLng)
-//                        var address = "${addr?.adminArea} ${addr?.locality} ${addr?.thoroughfare}"
-//                        if (address.contains("null")){
-//                            address = address.replace("null", "")
-//                            binding.tvLocation.text = address
-//                        }
-//                        binding.tvLocation.text = address
-//                        mainViewModel.getWeatherLatLng(qLat, qLng, WeatherAPI.KEY, WeatherAPI.LANG)
-//                        mainViewModel.getValue.observe(requireActivity(), Observer {
-//                            if(it != null) {
-//
-//                                // 현재 온도
-//                                val temp = getRealTemp(it.main.feels_like)
-//                                binding.tvTemp.text = "$temp °C"
-//                                // 옷 정보 설정
-//                                setInfo(temp)
-//                                // 날씨 아이콘 설정
-//                                setCodeToImg(it.weather[0].id)
-//                                // 날씨 설명
-//                                binding.tvDescription.text = it.weather[0].description
-//                            }
-//                        })
-//
-//                    } else {
-//                        // gps == null
-//                        Toast.makeText(mContext, "일시적으로 위치 정보를 가져올 수 없습니다", Toast.LENGTH_SHORT).show()
-//                    }
-//                }
-//            }
-//        }
     }
 
     private fun initSetting() {
         mLocation = CustomLocation(mContext)
         // 뷰모델 프로바이더를 통해 뷰모델 가져오기
-        mainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
+        currentViewModel = ViewModelProvider(this)[CurrentViewModel::class.java]
+        forecastViewModel = ViewModelProvider(this)[ForecastViewModel::class.java]
         binding.mainWearingInfo.itemWearingDescription.visibility = View.INVISIBLE
     }
 
@@ -119,6 +76,10 @@ class MainActivity : AppCompatActivity() {
         // 좌표로 날씨 받아오기
         val lat = mLocation.getMyLocation()?.latitude
         val lng = mLocation.getMyLocation()?.longitude
+
+//        // 좌표로 날씨 받아오기 (임시)
+//        val lat = 35.1518
+//        val lng = 129.0658
 
         if (lat != null && lng != null) {
             // 위치 이름 설정
@@ -130,24 +91,36 @@ class MainActivity : AppCompatActivity() {
             } else {
                 binding.mainCurrentLocation.text = address
             }
-            mainViewModel.getWeatherLatLng(lat, lng, WeatherAPI.KEY, WeatherAPI.LANG)
-            mainViewModel.getValue.observe(this) {
-                if (it != null) {
 
+            currentViewModel.getCurrentWeatherLatLng(lat, lng)
+            currentViewModel.getValue.observe(this) {
+                if (it != null) {
                     // 현재 온도
                     val temp = getRealTemp(it.main.temp)
                     binding.mainCurrentTemp.text = "$temp °C"
+                    Log.d(TAG, "temp: $temp")
                     // 옷 정보 설정
                     setInfo(temp)
                     // 날씨 아이콘 설정
                     binding.mainWeatherImg.setImageResource(setCodeToImg(it.weather[0].id))
                     // 날씨 설명
                     binding.mainWeatherDescription.text = it.weather[0].description
+                    Log.d(TAG, "${it.weather[0].description} ")
+                }
+            }
+            forecastViewModel.getForecastLatLng(lat, lng)
+            forecastViewModel.getValue.observe(this){
+                if (it != null) {
+
+                    for (item in it.list){
+                        Log.d(TAG, "max : ${item.dt_txt}")
+                        Log.d(TAG, "min : ${getRealTemp(item.main.temp_min)}")
+                        Log.d(TAG, "max : ${getRealTemp(item.main.temp_max)}")
+                    }
                 }
             }
         }
     }
-
 
     private fun getRealTemp(temp: Double): Double {
         val c = temp - 273.15
