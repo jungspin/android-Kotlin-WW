@@ -13,15 +13,6 @@ import retrofit2.http.Query
 interface WeatherAPI {
 
     @GET("weather")
-    fun getWeatherAPI(@Query("q") q: String, @Query("appid") appid: String): Call<WeatherData>
-
-//    @GET("weather")
-//    fun getWeatherLatLng(@Query("lat") lat: Double,
-//                         @Query("lon") lon: Double,
-//                         @Query("appid") appid: String,
-//                         @Query("lang")lang: String) : Call<WeatherLatLng>
-
-    @GET("weather")
     fun getCurrentWeatherLatLng(@Query("lat") lat: Double,
                          @Query("lon") lon: Double,
                          @Query("appid") appid: String,

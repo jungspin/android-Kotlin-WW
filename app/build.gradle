@@ -5,6 +5,9 @@ plugins {
 }
 apply plugin: 'kotlin-kapt'
 
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
 android {
     compileSdk 32
 
@@ -24,9 +27,10 @@ android {
     buildTypes {
         debug {
             minifyEnabled false
+            debuggable true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            buildConfigField "String", "BASE_URL", "\"https://api.openweathermap.org/data/2.5/\""
-            buildConfigField "String", "APP_KEY", "\"b016ea25b2f8daca52324260f8776eea\""
+            buildConfigField "String", "BASE_URL", properties['api_url']
+            buildConfigField "String", "APP_KEY", properties['api_key']
         }
         release {
             minifyEnabled false
@@ -56,36 +60,40 @@ dependencies {
     implementation 'com.google.android.material:material:1.6.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.5.0'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.5.1'
+    implementation "androidx.activity:activity-ktx:1.5.1"
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 
     // compose
     // Integration with activities
-    implementation 'androidx.activity:activity-compose:1.5.0'
+    implementation 'androidx.activity:activity-compose:1.5.1'
     // Compose Material Design
-    implementation 'androidx.compose.material:material:1.1.1'
+    implementation 'androidx.compose.material:material:1.2.0'
     // Animations
-    implementation 'androidx.compose.animation:animation:1.1.1'
+    implementation 'androidx.compose.animation:animation:1.2.0'
     // Tooling support (Previews, etc.)
-    implementation 'androidx.compose.ui:ui-tooling:1.1.1'
+    implementation 'androidx.compose.ui:ui-tooling:1.2.0'
     // Integration with ViewModels
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.5.0'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1'
     // UI Tests
-    androidTestImplementation 'androidx.compose.ui:ui-test-junit4:1.1.1'
+    androidTestImplementation 'androidx.compose.ui:ui-test-junit4:1.2.0'
 
     // Jetpack Navigation
     def nav_version = "2.5.0"
     // Jetpack Compose Integration
-    //implementation "androidx.navigation:navigation-compose:"
+    //noinspection GradleDependency
+    implementation "androidx.navigation:navigation-compose:$nav_version"
     // Navigation UI
+    //noinspection GradleDependency
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
     // Feature module Support
+    //noinspection GradleDependency
     implementation "androidx.navigation:navigation-dynamic-features-fragment:$nav_version"
     // Testing Navigation
+    //noinspection GradleDependency
     androidTestImplementation "androidx.navigation:navigation-testing:$nav_version"
-
 
     // retrofit2
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
@@ -99,18 +107,21 @@ dependencies {
     // okhttp
     implementation 'com.squareup.okhttp3:okhttp-urlconnection:4.9.2'
 
-    def lifecycle_version = "2.4.0-alpha03"
+    def lifecycle_version = "2.5.0"
     // ViewModel
     //noinspection GradleDependency
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
     // LiveData
     //noinspection GradleDependency
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
-    implementation "androidx.activity:activity-ktx:1.5.0"
+
 
     //Place API
     implementation 'com.google.android.gms:play-services-places:17.0.0'
     implementation 'com.google.android.gms:play-services-location:20.0.0'
+
+    // LeakCanary
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.9.1'
 
 
 
