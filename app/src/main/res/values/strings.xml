@@ -15,4 +15,6 @@
     <string name="main_current_temp">현재 온도</string>
     <string name="main_weather_description">날씨 설명</string>
     <string name="main_weather_helper_text">"아이콘을 클릭하면 상세정보를 볼 수 있어요💁‍♀"</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

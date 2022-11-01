@@ -2,18 +2,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/mainFragment"
+        android:id="@+id/currentLocationFragment"
         android:icon="@drawable/ic_main"
-        android:title="home"/>
+        android:title="current" />
 
     <item
-        android:id="@+id/recordFragment"
+        android:id="@+id/searchFragment"
         android:icon="@drawable/ic_record"
-        android:title="record"/>
+        android:title="search"/>
 
     <item
-        android:id="@+id/myPageFragment"
+        android:id="@+id/bookmarkFragment"
         android:icon="@drawable/ic_my_page"
-        android:title="my_page"/>
+        android:title="bookmark"/>
 
 </menu>
