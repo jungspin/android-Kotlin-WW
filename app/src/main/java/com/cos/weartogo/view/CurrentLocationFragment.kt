@@ -7,12 +7,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import com.cos.weartogo.R
+import com.cos.weartogo.adapter.ForecastAdapter
 import com.cos.weartogo.base.BaseFragment
 import com.cos.weartogo.config.CustomLocation
+import com.cos.weartogo.config.MyLocation
+import com.cos.weartogo.data.openweather.OpenWeather
 import com.cos.weartogo.databinding.FragmentCurrentLocationBinding
-import com.cos.weartogo.viewmodel.CurrentViewModel
-import com.cos.weartogo.viewmodel.ForecastViewModel
-import kotlin.math.floor
+import com.cos.weartogo.util.Utility
+import com.cos.weartogo.viewmodel.WeatherViewModel
 
 /**
  * @since 2022-11-01
@@ -21,11 +23,11 @@ private const val TAG = "CurrentLocationFragment"
 
 class CurrentLocationFragment : BaseFragment<FragmentCurrentLocationBinding>() {
 
-    private lateinit var currentViewModel: CurrentViewModel
-    private lateinit var forecastViewModel: ForecastViewModel
+    private lateinit var weatherViewModel: WeatherViewModel
     private lateinit var mLocation: CustomLocation
     private var lat: Double? = 0.0
     private var lng: Double? = 0.0
+    private lateinit var forecastAdapter : ForecastAdapter
 
     override fun getBinding(
         inflater: LayoutInflater,
@@ -60,36 +62,32 @@ class CurrentLocationFragment : BaseFragment<FragmentCurrentLocationBinding>() {
     override fun initSetting() {
         mLocation = CustomLocation(mContext)
         binding.mainWearingInfo.itemWearingDescription.visibility = View.INVISIBLE
+
+        forecastAdapter = ForecastAdapter()
+        binding.mainForecastRv.adapter = forecastAdapter
     }
 
+    @SuppressLint("SetTextI18n")
     override fun initViewModel() {
         // 뷰모델 프로바이더를 통해 뷰모델 가져오기
-        currentViewModel = ViewModelProvider(this)[CurrentViewModel::class.java]
-        currentViewModel.getValue.observe(this) {
+        weatherViewModel = ViewModelProvider(this)[WeatherViewModel::class.java]
+        weatherViewModel.getValue.observe(this) {
             if (it != null) {
                 // 현재 온도
-                val temp = getRealTemp(it.main.temp)
+                val temp = Utility.getRealTemp(it.main.temp)
                 binding.mainCurrentTemp.text = "$temp °C"
-                Log.d(TAG, "temp: $temp")
                 // 옷 정보 설정
                 setInfo(temp)
                 // 날씨 아이콘 설정
                 binding.mainWeatherImg.setImageResource(setCodeToImg(it.weather[0].id))
                 // 날씨 설명
                 binding.mainWeatherDescription.text = it.weather[0].description
-                Log.d(TAG, "${it.weather[0].description} ")
             }
         }
 
-        forecastViewModel = ViewModelProvider(this)[ForecastViewModel::class.java]
-        forecastViewModel.getValue.observe(this) {
-            if (it != null) {
-
-                for (item in it.list) {
-                    Log.d(TAG, "max : ${item.dt_txt}")
-                    Log.d(TAG, "min : ${getRealTemp(item.main.temp_min)}")
-                    Log.d(TAG, "max : ${getRealTemp(item.main.temp_max)}")
-                }
+        weatherViewModel.getForecastValue.observe(this) { data ->
+            if (data != null) {
+                forecastAdapter.setItems(data.list as MutableList<OpenWeather>)
             }
         }
     }
@@ -97,8 +95,11 @@ class CurrentLocationFragment : BaseFragment<FragmentCurrentLocationBinding>() {
     @SuppressLint("SetTextI18n")
     override fun initData() {
         // 좌표로 날씨 받아오기
-        lat = mLocation.getMyLocation()?.latitude
-        lng = mLocation.getMyLocation()?.longitude
+        val myLocation = MyLocation(mContext)
+//        lat = mLocation.getMyLocation()?.latitude
+//        lng = mLocation.getMyLocation()?.longitude
+        lat = myLocation.getMyLocation()?.lat
+        lng = myLocation.getMyLocation()?.lng
 
         if (lat != null && lng != null) {
             // 위치 이름 설정
@@ -115,14 +116,11 @@ class CurrentLocationFragment : BaseFragment<FragmentCurrentLocationBinding>() {
             lat = 35.1518
             lng = 129.0658
         }
-        currentViewModel.getCurrentWeatherLatLng(lat!!, lng!!)
-        forecastViewModel.getForecastLatLng(lat!!, lng!!)
+        weatherViewModel.getCurrentWeatherLatLng(lat!!, lng!!)
+        weatherViewModel.getForecastLatLng(lat!!, lng!!)
     }
 
-    private fun getRealTemp(temp: Double): Double {
-        val c = temp - 273.15
-        return floor(c)
-    }
+
 
     private fun setCodeToImg(code: Int): Int {
         var resourceId = 0
@@ -158,9 +156,10 @@ class CurrentLocationFragment : BaseFragment<FragmentCurrentLocationBinding>() {
         return resourceId
     }
 
-    private fun setInfo(temp: Double) {
+    private fun setInfo(tempString: String) {
         var wearDescription = ""
         var wearInfoList: ArrayList<Int> = arrayListOf()
+        val temp = tempString.toDouble()
         if (temp >= 28.0) {
             wearDescription = getString(R.string.description_28)
             wearInfoList = arrayListOf(
@@ -217,4 +216,5 @@ class CurrentLocationFragment : BaseFragment<FragmentCurrentLocationBinding>() {
         binding.mainWearingInfo.itemWearing2.setImageResource(wearInfoList[1])
         binding.mainWearingInfo.itemWearing3.setImageResource(wearInfoList[2])
     }
+
 }

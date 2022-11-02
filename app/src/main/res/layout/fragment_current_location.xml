@@ -6,11 +6,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:overScrollMode="never"
     tools:context=".view.CurrentLocationFragment">
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_margin="15dp"
         tools:context=".view.main.MainFragment">
@@ -81,6 +82,10 @@
             android:id="@+id/main_forecast_rv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            android:orientation="vertical"
+            android:overScrollMode="never"
+            tools:listitem="@layout/item_forecast"
             android:layout_marginTop="8dp">
 
         </androidx.recyclerview.widget.RecyclerView>

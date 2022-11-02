@@ -7,6 +7,10 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/dev/android-Kotlin-wearToGo/app/src/main/res/layout/activity_main.xml" value="0.44635416666666666" />
+        <entry key="..\:/dev/android-Kotlin-wearToGo/app/src/main/res/layout/fragment_current_location.xml" value="0.44635416666666666" />
+        <entry key="..\:/dev/android-Kotlin-wearToGo/app/src/main/res/layout/item_forecast.xml" value="0.44635416666666666" />
+        <entry key="..\:/dev/android-Kotlin-wearToGo/app/src/main/res/layout/item_wearing_info.xml" value="0.44635416666666666" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.33" />
         <entry key="app/src/main/res/layout/activity_progress_dialog.xml" value="0.37604166666666666" />
         <entry key="app/src/main/res/layout/fragment_current_location.xml" value="0.321875" />
