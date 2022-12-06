@@ -1,5 +1,6 @@
 package com.pinslog.ww
 
+import com.pinslog.ww.util.Utility
 import org.junit.Test
 import java.util.*
 
@@ -35,6 +36,12 @@ class WwApplicationTest {
             }
         }
         println(day)
+    }
+
+    @Test
+    fun kToCTest(){
+        val temp = 274.69
+        println(Utility.getRealTemp(temp))
     }
 
 }

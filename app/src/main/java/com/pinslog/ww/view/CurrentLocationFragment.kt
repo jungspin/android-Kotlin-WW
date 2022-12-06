@@ -3,8 +3,11 @@ package com.pinslog.ww.view
 import android.annotation.SuppressLint
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.TextureView
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.lifecycle.ViewModelProvider
 import com.pinslog.ww.R
 import com.pinslog.ww.adapter.ForecastAdapter
@@ -12,6 +15,7 @@ import com.pinslog.ww.base.BaseFragment
 import com.pinslog.ww.config.CustomLocation
 import com.pinslog.ww.config.MyLocation
 import com.pinslog.ww.databinding.FragmentCurrentLocationBinding
+import com.pinslog.ww.model.WearInfo
 import com.pinslog.ww.util.Utility
 import com.pinslog.ww.viewmodel.WeatherViewModel
 
@@ -76,7 +80,15 @@ class CurrentLocationFragment : BaseFragment<FragmentCurrentLocationBinding>() {
                 val temp = Utility.getRealTemp(it.main.temp)
                 binding.mainCurrentTemp.text = "$temp °C"
                 // 옷 정보 설정
-                setInfo(temp)
+                val wearInfo = Utility.getWearingInfo(mContext, temp)
+                val wearInfoBinding = binding.mainWearingInfo
+                wearInfoBinding.itemWearingDescription.text = wearInfo.infoDescription
+                val infoList = wearInfo.wearingList
+
+                wearInfoBinding.itemWearing1.setImageResource(infoList[0])
+                wearInfoBinding.itemWearing2.setImageResource(infoList[1])
+                wearInfoBinding.itemWearing3.setImageResource(infoList[2])
+
                 // 날씨 아이콘 설정
                 binding.mainWeatherImg.setImageResource(Utility.setCodeToImg(it.weather[0].id))
                 // 날씨 설명
@@ -121,66 +133,14 @@ class CurrentLocationFragment : BaseFragment<FragmentCurrentLocationBinding>() {
 
     }
 
-
-    private fun setInfo(tempString: String) {
-        var wearDescription = ""
-        var wearInfoList: ArrayList<Int> = arrayListOf()
-        val temp = tempString.toDouble()
-        if (temp >= 28.0) {
-            wearDescription = getString(R.string.description_28)
-            wearInfoList = arrayListOf(
-                R.drawable.ic_sleeve,
-                R.drawable.ic_half_pants,
-                R.drawable.ic_half_sleeve
-            )
-        }
-        when (temp) {
-            in 23.0..27.0 -> {
-                wearDescription = getString(R.string.description_23)
-                wearInfoList = arrayListOf(
-                    R.drawable.ic_half_sleeve,
-                    R.drawable.ic_half_pants,
-                    R.drawable.ic_light_shirt
-                )
-            }
-            in 20.0..22.0 -> {
-                wearDescription = getString(R.string.description_20)
-                wearInfoList = arrayListOf(
-                    R.drawable.ic_light_cardigan,
-                    R.drawable.ic_cotton_pants,
-                    R.drawable.ic_long_sleeve
-                )
-            }
-            in 17.0..19.0 -> {
-                wearDescription = getString(R.string.description_17)
-                wearInfoList =
-                    arrayListOf(R.drawable.ic_light_knit, R.drawable.ic_jean, R.drawable.ic_mtm)
-            }
-            in 12.0..16.0 -> {
-                wearDescription = getString(R.string.description_12)
-                wearInfoList =
-                    arrayListOf(R.drawable.ic_jacket_2, R.drawable.ic_jean, R.drawable.ic_cardigan)
-            }
-            in 9.0..11.0 -> {
-                wearDescription = getString(R.string.description_9)
-                wearInfoList =
-                    arrayListOf(R.drawable.ic_jacket_2, R.drawable.ic_coat, R.drawable.ic_knit)
-            }
-            in 5.0..8.0 -> {
-                wearDescription = getString(R.string.description_5)
-                wearInfoList =
-                    arrayListOf(R.drawable.ic_knit, R.drawable.ic_coat, R.drawable.ic_jacket)
-            }
-        }
-        if (temp <= 4.0) {
-            wearDescription = getString(R.string.description_4)
-            wearInfoList =
-                arrayListOf(R.drawable.ic_safari, R.drawable.ic_hat, R.drawable.ic_muffler)
-        }
-        binding.mainWearingInfo.itemWearingDescription.text = wearDescription
-        binding.mainWearingInfo.itemWearing1.setImageResource(wearInfoList[0])
-        binding.mainWearingInfo.itemWearing2.setImageResource(wearInfoList[1])
-        binding.mainWearingInfo.itemWearing3.setImageResource(wearInfoList[2])
+    fun setInfo(textView : TextView, imageView: ImageView, wearInfo: WearInfo){
+        textView.text = wearInfo.infoDescription
+        val infoList = wearInfo.wearingList
+        imageView.setImageResource(infoList[0])
+        imageView.setImageResource(infoList[1])
+        imageView.setImageResource(infoList[2])
     }
+
+
 
 }

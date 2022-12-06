@@ -63,7 +63,7 @@ class WeatherViewModel() : ViewModel() {
                     it.date = "$month-$date"
                 }
                 val tmp = it.list.groupBy { it.date }
-                val tempList = mutableListOf<Double>()
+
                 var id = 0
                 tmp.forEach { map ->
                     // month, date
@@ -72,21 +72,27 @@ class WeatherViewModel() : ViewModel() {
                     val date = dateParts[1]
 
                     // weather icon
+                    val maxTempList = mutableListOf<Double>()
+                    val minTempList = mutableListOf<Double>()
                     map.value.forEach {
-                        tempList.add(it.main.temp)
+
+                        maxTempList.add(it.main.temp_max)
+                        minTempList.add(it.main.temp_min)
                         it.weather.forEach { id = it.id }
                     }
                     // min, max temp
-                    val min = tempList.minOf { Utility.getRealTemp(it) }
-                    val max = tempList.maxOf { Utility.getRealTemp(it) }
+                    val minValue = minTempList.minOf { it }
+                    val maxValue = maxTempList.maxOf { it }
 
                     val forecastDO = ForecastDO(
                         month = month,
                         date = date,
                         id = id,
-                        maxTemp = max,
-                        minTemp = min,
+                        maxTemp = Utility.getRealTemp(maxValue),
+                        minTemp = Utility.getRealTemp(minValue),
                     )
+                    maxTempList.clear()
+                    minTempList.clear()
                     weatherList.add(forecastDO)
                 }
                 forecastMutableData.value = weatherList
