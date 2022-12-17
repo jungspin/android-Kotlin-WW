@@ -10,11 +10,20 @@
         <item name="colorSecondaryVariant">@color/main</item>
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <item name="android:statusBarColor" >?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
     </style>
 
     <style name="ForecastTextView">
         <item name="android:gravity">center_vertical</item>
+    </style>
+
+    <style name="BaseTextView">
+        <item name="android:gravity">center</item>
+        <item name="android:layout_marginTop">8dp</item>
+    </style>
+
+    <style name="TempDescTextView" parent="BaseTextView">
+        <item name="android:textAppearance">?attr/textAppearanceBody2</item>
     </style>
 </resources>

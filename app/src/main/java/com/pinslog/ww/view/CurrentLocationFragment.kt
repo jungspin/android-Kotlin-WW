@@ -18,6 +18,10 @@ import com.pinslog.ww.databinding.FragmentCurrentLocationBinding
 import com.pinslog.ww.model.WearInfo
 import com.pinslog.ww.util.Utility
 import com.pinslog.ww.viewmodel.WeatherViewModel
+import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.util.*
+import kotlin.math.min
 
 /**
  * @since 2022-11-01
@@ -40,31 +44,31 @@ class CurrentLocationFragment : BaseFragment<FragmentCurrentLocationBinding>() {
         return binding
     }
 
-    @SuppressLint("SetTextI18n")
-    private val wearingInfoListener = View.OnClickListener {
-        binding.mainWearingInfo.itemWearingDescription.bringToFront()
-        binding.mainWearingInfo.itemWearing1.visibility = View.INVISIBLE
-        binding.mainWearingInfo.itemWearing2.visibility = View.INVISIBLE
-        binding.mainWearingInfo.itemWearing3.visibility = View.INVISIBLE
-        binding.mainWearingInfo.itemWearingDescription.visibility = View.VISIBLE
-    }
-
-    @SuppressLint("SetTextI18n")
-    override fun initListener() {
-        binding.mainWearingInfo.itemWearing1.setOnClickListener(wearingInfoListener)
-        binding.mainWearingInfo.itemWearing2.setOnClickListener(wearingInfoListener)
-        binding.mainWearingInfo.itemWearing3.setOnClickListener(wearingInfoListener)
-        binding.mainWearingInfo.itemWearingDescription.setOnClickListener {
-            binding.mainWearingInfo.itemWearing1.visibility = View.VISIBLE
-            binding.mainWearingInfo.itemWearing2.visibility = View.VISIBLE
-            binding.mainWearingInfo.itemWearing3.visibility = View.VISIBLE
-            binding.mainWearingInfo.itemWearingDescription.visibility = View.INVISIBLE
-        }
-    }
+//    @SuppressLint("SetTextI18n")
+//    private val wearingInfoListener = View.OnClickListener {
+//        binding.mainWearingInfo.itemWearingDescription.bringToFront()
+//        binding.mainWearingInfo.itemWearing1.visibility = View.INVISIBLE
+//        binding.mainWearingInfo.itemWearing2.visibility = View.INVISIBLE
+//        binding.mainWearingInfo.itemWearing3.visibility = View.INVISIBLE
+//        binding.mainWearingInfo.itemWearingDescription.visibility = View.VISIBLE
+//    }
+//
+//    @SuppressLint("SetTextI18n")
+//    override fun initListener() {
+//        binding.mainWearingInfo.itemWearing1.setOnClickListener(wearingInfoListener)
+//        binding.mainWearingInfo.itemWearing2.setOnClickListener(wearingInfoListener)
+//        binding.mainWearingInfo.itemWearing3.setOnClickListener(wearingInfoListener)
+//        binding.mainWearingInfo.itemWearingDescription.setOnClickListener {
+//            binding.mainWearingInfo.itemWearing1.visibility = View.VISIBLE
+//            binding.mainWearingInfo.itemWearing2.visibility = View.VISIBLE
+//            binding.mainWearingInfo.itemWearing3.visibility = View.VISIBLE
+//            binding.mainWearingInfo.itemWearingDescription.visibility = View.INVISIBLE
+//        }
+//    }
 
     override fun initSetting() {
         mLocation = CustomLocation(mContext)
-        binding.mainWearingInfo.itemWearingDescription.visibility = View.INVISIBLE
+        //binding.mainWearingInfo.itemWearingDescription.visibility = View.INVISIBLE
 
         forecastAdapter = ForecastAdapter()
         binding.mainForecastRv.adapter = forecastAdapter
@@ -77,17 +81,24 @@ class CurrentLocationFragment : BaseFragment<FragmentCurrentLocationBinding>() {
         weatherViewModel.getValue.observe(this) {
             if (it != null) {
                 // 현재 온도
-                val temp = Utility.getRealTemp(it.main.temp)
-                binding.mainCurrentTemp.text = "$temp °C"
-                // 옷 정보 설정
-                val wearInfo = Utility.getWearingInfo(mContext, temp)
-                val wearInfoBinding = binding.mainWearingInfo
-                wearInfoBinding.itemWearingDescription.text = wearInfo.infoDescription
-                val infoList = wearInfo.wearingList
+                val weatherInfo = it.main
+                val temp = Utility.getRealTemp(weatherInfo.temp)
+                binding.mainCurrentTemp.text = "$temp"
 
-                wearInfoBinding.itemWearing1.setImageResource(infoList[0])
-                wearInfoBinding.itemWearing2.setImageResource(infoList[1])
-                wearInfoBinding.itemWearing3.setImageResource(infoList[2])
+                // 현재 시간
+                val dateFormat = SimpleDateFormat("yyyy년 MM월 dd일 hh시 mm분", Locale.KOREAN)
+                val date = dateFormat.format(Calendar.getInstance().time)
+                binding.mainCurrentTime.text = "$date"
+
+                // 옷 정보 설정
+//                val wearInfo = Utility.getWearingInfo(mContext, temp)
+//                val wearInfoBinding = binding.mainWearingInfo
+//                wearInfoBinding.itemWearingDescription.text = wearInfo.infoDescription
+//                val infoList = wearInfo.wearingList
+
+//                wearInfoBinding.itemWearing1.setImageResource(infoList[0])
+//                wearInfoBinding.itemWearing2.setImageResource(infoList[1])
+//                wearInfoBinding.itemWearing3.setImageResource(infoList[2])
 
                 // 날씨 아이콘 설정
                 binding.mainWeatherImg.setImageResource(Utility.setCodeToImg(it.weather[0].id))
