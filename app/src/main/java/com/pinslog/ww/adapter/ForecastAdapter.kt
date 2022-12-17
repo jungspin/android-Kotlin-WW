@@ -64,10 +64,6 @@ class ForecastAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         }
 
-        private val toggleButtonClickListener = View.OnClickListener {
-            isMaxButtonClicked =
-                binding.itemWearingToggleRoot.checkedButtonId != binding.itemWearingMaxBtn.id
-        }
 
         @SuppressLint("SetTextI18n")
         fun onBind(forecastDO: ForecastDO?) {
@@ -80,7 +76,7 @@ class ForecastAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             forecastDO?.resourceId?.let { binding.itemForecastIcon.setImageResource(it) }
             binding.itemForecastMaxTemp.text = "${forecastDO?.maxTemp}"
             binding.itemForecastMinTemp.text = "${forecastDO?.minTemp}"
-            
+
             getTemp(forecastDO?.maxTemp.toString())
             binding.itemWearingMaxBtn.setOnClickListener {
                 getTemp(forecastDO?.maxTemp.toString())

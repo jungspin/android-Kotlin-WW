@@ -2,6 +2,7 @@ package com.pinslog.ww
 
 import com.pinslog.ww.util.Utility
 import org.junit.Test
+import java.time.LocalDateTime
 import java.util.*
 
 class WwApplicationTest {
@@ -42,6 +43,22 @@ class WwApplicationTest {
     fun kToCTest(){
         val temp = 274.69
         println(Utility.getRealTemp(temp))
+    }
+
+    @Test
+    fun isBeforeDate() {
+        // 이미 지난 시간의 예보는 제외한다.
+        // 15:00:00
+        val year = "2022".toInt()
+        val month = "12".toInt()
+        val date = "14".toInt()
+        val hour = "12".toInt()
+
+        // 인자를 LocalDateTime으로 만듬
+        val localDateTime = LocalDateTime.of(year, month, date, hour, 0)
+        // 현재 시간을 LocalDateTime 으로 만듬
+        val currentTime = LocalDateTime.now()
+        println(localDateTime.isBefore(currentTime))
     }
 
 }

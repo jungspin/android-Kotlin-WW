@@ -12,6 +12,7 @@ import java.lang.Exception
 import kotlin.math.floor
 import kotlin.math.round
 
+// TODO lazy load 되게 만들기
 object Utility {
 
     /**

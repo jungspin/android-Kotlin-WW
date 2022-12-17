@@ -8,13 +8,13 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
-class WeatherService (retrofitInstance: RetrofitInstance) {
+class WeatherRepository () {
 
     companion object{
         const val LANG = "kr"
     }
 
-    private var weatherApi : WeatherAPI = retrofitInstance.getInstance().create(WeatherAPI::class.java)
+    private var weatherApi : WeatherAPI = RetrofitInstance.getInstance().create(WeatherAPI::class.java)
 
     fun getCurrentWeatherLatLng(lat: Double, lng: Double) : Single<WeatherLatLng>{
         return weatherApi.getCurrentWeatherLatLng(lat, lng, BuildConfig.APP_KEY, LANG)
