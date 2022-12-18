@@ -10,7 +10,11 @@
         <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.2025" />
         <entry key="app/src/main/res/drawable/ic_arrow_down.xml" value="0.267" />
         <entry key="app/src/main/res/drawable/ic_arrow_up.xml" value="0.267" />
+        <entry key="app/src/main/res/drawable/ic_close.xml" value="0.219" />
         <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.272" />
+        <entry key="app/src/main/res/drawable/stroke_color.xml" value="0.219" />
+        <entry key="app/src/main/res/layout/activity_add_bookmark.xml" value="0.27575887131252674" />
+        <entry key="app/src/main/res/layout/activity_add_location_dialog.xml" value="0.27575887131252674" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.33" />
         <entry key="app/src/main/res/layout/activity_progress_dialog.xml" value="0.37604166666666666" />
         <entry key="app/src/main/res/layout/fragment_current_location.xml" value="0.2941712204007286" />

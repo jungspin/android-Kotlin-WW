@@ -2,15 +2,9 @@ package com.pinslog.ww.view
 
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
-import androidx.navigation.NavController
-import androidx.navigation.Navigation
-import androidx.navigation.findNavController
-import androidx.navigation.fragment.findNavController
-import com.pinslog.ww.R
 import com.pinslog.ww.databinding.ActivityMainBinding
 
 
@@ -28,13 +22,12 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        initAppbar()
+        binding.mainAddFab.setOnClickListener{
+            val intent = Intent(mContext, LookupBookmarkActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
+            startActivity(intent)
+        }
 
     }
-
-    // TODO 해결하기
-    private fun initAppbar() {
-    }
-
 
 }
