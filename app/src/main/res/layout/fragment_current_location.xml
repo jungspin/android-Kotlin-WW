@@ -1,138 +1,149 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_swipe_refresh_root"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:overScrollMode="never"
-    tools:context=".view.CurrentLocationFragment">
+    android:layout_height="match_parent">
 
-    <androidx.appcompat.widget.LinearLayoutCompat
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
+        android:layout_height="match_parent"
         android:orientation="vertical"
-        tools:context=".view.main.MainFragment">
+        android:overScrollMode="never"
+        tools:context=".view.CurrentLocationFragment">
 
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/main_current_card_view"
+        <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:elevation="@dimen/cardview_default_elevation"
-            app:cardElevation="0dp"
-            app:strokeColor="@drawable/stroke_color"
-            app:strokeWidth="1dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:layout_margin="16dp"
+            android:orientation="vertical"
+            tools:context=".view.main.MainFragment">
 
-            <androidx.appcompat.widget.LinearLayoutCompat
-                android:id="@+id/main_current_root"
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/main_current_card_view"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:padding="8dp">
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:elevation="@dimen/cardview_default_elevation"
+                app:cardElevation="0dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:strokeColor="@drawable/stroke_color"
+                app:strokeWidth="1dp">
 
-                <TextView
-                    android:id="@+id/main_current_location"
-                    style="@style/BaseTextView"
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/main_current_root"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:id="@+id/main_current_time"
-                    style="@style/BaseTextView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?attr/textAppearanceBody2"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/main_current_location_tv" />
-
-                <ImageView
-                    android:id="@+id/main_weather_img"
-                    style="@style/BaseTextView"
-                    android:padding="4dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="150dp" />
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/main_temp_root"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp">
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:padding="8dp">
 
                     <TextView
-                        android:id="@+id/main_current_temp"
-                        android:layout_width="wrap_content"
+                        android:id="@+id/main_current_location"
+                        style="@style/BaseTextView"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textAppearance="?attr/textAppearanceHeadline6"
-                        app:layout_constraintEnd_toStartOf="@+id/main_current_temp_unit"
-                        app:layout_constraintHorizontal_bias="0.5"
-                        app:layout_constraintHorizontal_chainStyle="packed"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
+                        app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <TextView
-                        android:id="@+id/main_current_temp_unit"
-                        android:layout_width="wrap_content"
+                        android:id="@+id/main_current_time"
+                        style="@style/BaseTextView"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="°C"
-                        android:textAppearance="?attr/textAppearanceBody1"
-                        app:layout_constraintBottom_toBottomOf="@+id/main_current_temp"
+                        android:textAppearance="?attr/textAppearanceBody2"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_bias="0.5"
-                        app:layout_constraintStart_toEndOf="@+id/main_current_temp"
-                        app:layout_constraintTop_toTopOf="@+id/main_current_temp" />
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/main_current_location_tv" />
 
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                    <ImageView
+                        android:id="@+id/main_weather_img"
+                        style="@style/BaseTextView"
+                        android:layout_width="match_parent"
+                        android:layout_height="150dp"
+                        android:padding="4dp" />
 
-                <TextView
-                    android:id="@+id/main_weather_description"
-                    style="@style/BaseTextView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?attr/textAppearanceBody2" />
-
-                <androidx.appcompat.widget.LinearLayoutCompat
-                    android:id="@+id/main_btn_root"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="8dp"
-                    android:gravity="center">
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/main_look_info_btn"
-                        style="?attr/borderlessButtonStyle"
-                        android:layout_width="wrap_content"
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/main_temp_root"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="오늘 뭐입지?" />
+                        android:layout_marginTop="8dp">
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/main_share_btn"
-                        style="?attr/borderlessButtonStyle"
-                        android:layout_width="wrap_content"
+                        <TextView
+                            android:id="@+id/main_current_temp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="?attr/textAppearanceHeadline6"
+                            app:layout_constraintEnd_toStartOf="@+id/main_current_temp_unit"
+                            app:layout_constraintHorizontal_bias="0.5"
+                            app:layout_constraintHorizontal_chainStyle="packed"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <TextView
+                            android:id="@+id/main_current_temp_unit"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="°C"
+                            android:textAppearance="?attr/textAppearanceBody1"
+                            app:layout_constraintBottom_toBottomOf="@+id/main_current_temp"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintHorizontal_bias="0.5"
+                            app:layout_constraintStart_toEndOf="@+id/main_current_temp"
+                            app:layout_constraintTop_toTopOf="@+id/main_current_temp" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <TextView
+                        android:id="@+id/main_weather_description"
+                        style="@style/BaseTextView"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="공유하기" />
+                        android:textAppearance="?attr/textAppearanceBody2" />
+
+                    <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/main_btn_root"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="8dp"
+                        android:gravity="center">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/main_look_info_btn"
+                            style="?attr/borderlessButtonStyle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="오늘 뭐입지?" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/main_share_btn"
+                            style="?attr/borderlessButtonStyle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="공유하기" />
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
+                    <include
+                        android:id="@+id/main_current_wearinfo_root"
+                        layout="@layout/item_wearing_info"
+                        android:visibility="gone" />
                 </androidx.appcompat.widget.LinearLayoutCompat>
-            </androidx.appcompat.widget.LinearLayoutCompat>
-        </com.google.android.material.card.MaterialCardView>
+            </com.google.android.material.card.MaterialCardView>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/main_forecast_rv"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:orientation="vertical"
-            android:overScrollMode="never"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:listitem="@layout/item_forecast" />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/main_forecast_rv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="vertical"
+                android:overScrollMode="never"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/item_forecast" />
 
-    </androidx.appcompat.widget.LinearLayoutCompat>
-</androidx.core.widget.NestedScrollView>
+        </androidx.appcompat.widget.LinearLayoutCompat>
+    </androidx.core.widget.NestedScrollView>
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

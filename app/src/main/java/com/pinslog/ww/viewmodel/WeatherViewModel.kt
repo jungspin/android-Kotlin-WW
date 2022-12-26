@@ -1,11 +1,11 @@
 package com.pinslog.ww.viewmodel
 
 import android.os.Build
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.pinslog.ww.config.RetrofitInstance
-import com.pinslog.ww.model.ForecastDO
 import com.pinslog.ww.data.weatherLatLng.WeatherLatLng
+import com.pinslog.ww.model.ForecastDO
 import com.pinslog.ww.service.WeatherRepository
 import com.pinslog.ww.util.Utility
 import io.reactivex.disposables.Disposable
@@ -57,6 +57,7 @@ class WeatherViewModel() : ViewModel() {
                 it.list.filter {
                     isBeforeForecast(it.dt_txt)
                 }
+                var pop = 0
                 it.list.forEach {
                     val dt = it.dt_txt.split(" ")
                     val dateArray = dt[0].split("-")
@@ -64,6 +65,7 @@ class WeatherViewModel() : ViewModel() {
                     val date = dateArray[2]
 
                     it.date = "$month-$date"
+                    pop = (it.pop * 100).toInt()
                 }
 
                 val tmp = it.list.groupBy { it.date }
@@ -94,6 +96,7 @@ class WeatherViewModel() : ViewModel() {
                         id = id,
                         maxTemp = Utility.getRealTemp(maxValue),
                         minTemp = Utility.getRealTemp(minValue),
+                        pop = pop,
                     )
                     maxTempList.clear()
                     minTempList.clear()
@@ -105,7 +108,7 @@ class WeatherViewModel() : ViewModel() {
 
 
     // 이게..의미가 있나..? 일단은 그냥 두는게..나을지도
-    private fun isBeforeForecast(dateText: String): Boolean{
+    private fun isBeforeForecast(dateText: String): Boolean {
         val dateTextParts = dateText.split(" ")
         val datePart = dateTextParts[0].split("-")
         val timePart = dateTextParts[1].split(":")

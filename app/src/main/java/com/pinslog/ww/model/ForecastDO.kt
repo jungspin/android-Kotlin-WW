@@ -9,6 +9,7 @@ class ForecastDO constructor(
     var id: Int,
     var maxTemp: String,
     var minTemp: String,
+    val pop:Int,
 ) {
     private val calendar = Calendar.getInstance()
     val dateString : String

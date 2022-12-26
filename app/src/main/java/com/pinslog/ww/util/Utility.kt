@@ -20,7 +20,7 @@ object Utility {
      */
     fun getRealTemp(temp: Double): String {
         val c = temp - 273.15
-        return floor(c).toString()
+        return c.toInt().toString()
     }
 
     /**

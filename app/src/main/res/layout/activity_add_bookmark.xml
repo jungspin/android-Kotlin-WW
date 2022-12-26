@@ -8,7 +8,7 @@
     tools:context=".view.AddBookmarkActivity">
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/add_text_input_layout"
+        android:id="@+id/bookmark_search_input_layout"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -21,7 +21,7 @@
         app:startIconDrawable="@drawable/ic_search">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/add_location_search"
+            android:id="@+id/bookmark_search_edit_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="text"

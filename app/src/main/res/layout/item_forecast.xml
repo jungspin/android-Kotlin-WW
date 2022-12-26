@@ -93,6 +93,7 @@
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:paddingStart="8dp"
+                    android:gravity="center"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/item_info_arrow_iv"
                     app:layout_constraintHorizontal_bias="0.5"
@@ -120,73 +121,78 @@
                 android:layout_height="match_parent"
                 android:visibility="gone">
 
-
-
-                <ImageView
-                    android:id="@+id/item_wearing_1"
-                    android:layout_width="0dp"
-                    android:layout_height="100dp"
-                    app:layout_constraintEnd_toStartOf="@+id/item_wearing_2"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintHorizontal_weight="3"
+                <include
+                    android:id="@+id/item_wearing_info_root"
+                    layout="@layout/item_wearing_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <ImageView
-                    android:id="@+id/item_wearing_2"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    app:layout_constraintBottom_toBottomOf="@+id/item_wearing_1"
-                    app:layout_constraintEnd_toStartOf="@+id/item_wearing_3"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintHorizontal_weight="3"
-                    app:layout_constraintStart_toEndOf="@+id/item_wearing_1"
-                    app:layout_constraintTop_toTopOf="@+id/item_wearing_1" />
-
-                <ImageView
-                    android:id="@+id/item_wearing_3"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    app:layout_constraintBottom_toBottomOf="@+id/item_wearing_2"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintHorizontal_weight="3"
-                    app:layout_constraintStart_toEndOf="@+id/item_wearing_2"
-                    app:layout_constraintTop_toTopOf="@+id/item_wearing_2" />
-
-                <TextView
-                    android:id="@+id/item_wearing_description"
-                    android:layout_width="match_parent"
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/item_forecast_pop_root"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:gravity="center"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    android:padding="4dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/item_wearing_1" />
+                    app:layout_constraintTop_toBottomOf="@+id/item_wearing_info_root">
 
+                    <TextView
+                        android:id="@+id/item_forecast_pop_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="비올 확률"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+                    <TextView
+                        android:id="@+id/item_forecast_pop"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:text=""
+                        app:layout_constraintBottom_toBottomOf="@+id/item_forecast_pop_label"
+                        app:layout_constraintStart_toEndOf="@+id/item_forecast_pop_label"
+                        app:layout_constraintTop_toTopOf="@+id/item_forecast_pop_label" />
+
+                    <TextView
+                        android:id="@+id/item_forecast_pop_unit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:text="%"
+                        app:layout_constraintBottom_toBottomOf="@+id/item_forecast_pop"
+                        app:layout_constraintStart_toEndOf="@+id/item_forecast_pop"
+                        app:layout_constraintTop_toTopOf="@+id/item_forecast_pop" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <com.google.android.material.button.MaterialButtonToggleGroup
                     android:id="@+id/item_wearing_toggle_root"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="40dp"
                     android:gravity="end"
-                    app:layout_constraintTop_toBottomOf="@+id/item_wearing_description"
-                    app:singleSelection="true"
-                    app:checkedButton="@id/item_wearing_max_btn">
+                    app:checkedButton="@id/item_wearing_max_btn"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/item_wearing_info_root"
+                    app:singleSelection="true">
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/item_wearing_max_btn"
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                         android:layout_width="70dp"
-                        android:layout_height="match_parent"
-                        android:text="max" />
+                        android:layout_height="wrap_content"
+                        android:text="max"
+                        android:textAppearance="@style/TextAppearance.Material3.BodySmall"/>
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/item_wearing_min_btn"
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                         android:layout_width="70dp"
-                        android:layout_height="match_parent"
-                        android:text="min" />
+                        android:layout_height="wrap_content"
+                        android:text="min"
+                        android:textAppearance="@style/TextAppearance.Material3.BodySmall"/>
                 </com.google.android.material.button.MaterialButtonToggleGroup>
 
             </androidx.constraintlayout.widget.ConstraintLayout>

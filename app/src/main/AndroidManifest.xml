@@ -22,7 +22,7 @@
         tools:ignore="HardcodedDebugMode"
         tools:targetApi="m">
         <activity
-            android:name=".view.LookupBookmarkActivity"
+            android:name=".view.BookmarkActivity"
             android:exported="false" />
         <activity
             android:name=".view.MainActivity"

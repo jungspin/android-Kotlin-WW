@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
-    tools:context=".view.LookupBookmarkActivity">
+    tools:context=".view.BookmarkActivity">
 
     <TextView
         android:id="@+id/add_location_close_btn"
@@ -17,19 +17,26 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-
-    <androidx.appcompat.widget.LinearLayoutCompat
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/bookmark_tab_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/add_location_close_btn">
+        app:layout_constraintTop_toBottomOf="@+id/add_location_close_btn"
+        android:layout_marginTop="8dp"
+        app:tabGravity="fill"
+        app:tabMaxWidth="0dp"
+        app:tabMode="fixed" />
 
-        <!--   즐겨찾기 없음 화면   -->
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-    </androidx.appcompat.widget.LinearLayoutCompat>
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/bookmark_view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="4dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bookmark_tab_layout" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

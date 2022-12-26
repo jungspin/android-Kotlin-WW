@@ -35,6 +35,8 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField "String", "BASE_URL", properties['api_url']
+            buildConfigField "String", "APP_KEY", properties['api_key']
         }
     }
     compileOptions {

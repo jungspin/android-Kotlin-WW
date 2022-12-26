@@ -1,3 +1,3 @@
 package com.pinslog.ww.model
 
-data class LatLng(val lat: Double, val lng : Double)
+data class LatLng(var lat: Double, var lng : Double)

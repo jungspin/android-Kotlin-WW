@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.mainAddFab.setOnClickListener{
-            val intent = Intent(mContext, LookupBookmarkActivity::class.java)
+            val intent = Intent(mContext, BookmarkActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
             startActivity(intent)
         }
