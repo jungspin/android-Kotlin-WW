@@ -1,4 +1,4 @@
-package com.pinslog.ww.config
+package com.pinslog.ww.util
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -8,10 +8,11 @@ import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import com.pinslog.ww.model.LatLng
+import dagger.hilt.android.qualifiers.ActivityContext
 
 private const val TAG = "MyLocation"
 
-class MyLocation(private val mContext: Context) {
+class MyLocation(val mContext: Context) {
     var currentLocation: Location? = null
     var latLng = LatLng(0.0, 0.0)
 
@@ -40,7 +41,8 @@ class MyLocation(private val mContext: Context) {
                     locationChangeListener
                 )
                 // network provider 로 대략적인 위치정보 받아오기
-                val networkLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
+                val networkLocation =
+                    locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
                 if (networkLocation == null) {
                     Toast.makeText(mContext, "현재 위치 정보를 가져올 수 없어요", Toast.LENGTH_SHORT).show()
                 } else {
@@ -70,30 +72,25 @@ class MyLocation(private val mContext: Context) {
      * @return 변환된 주소값
      */
     fun latLngToAddress(lat: Double, lng: Double): String {
-        var list: List<Address> = mutableListOf()
+        var addressList: List<Address> = mutableListOf()
         val geocoder = Geocoder(mContext)
 
         try {
-            list = geocoder.getFromLocation(lat, lng, 10)
-            //Log.d(TAG, "latLngToAddress: ${list}")
+            addressList = geocoder.getFromLocation(lat, lng, 10)
+            Log.d(TAG, "latLngToAddress: ${addressList}")
         } catch (e: Exception) {
             e.printStackTrace()
         }
 
-        return if (list.isNotEmpty()) {
-            val addr = list[0]
-            val address = "${addr.adminArea} ${addr.locality} ${addr.thoroughfare}"
-            if (address.contains("null")) {
-                address.replace("null", "")
-            } else {
-                address
-            }
-        } else {
-            Toast.makeText(mContext, "해당 되는 주소 정보는 없습니다", Toast.LENGTH_SHORT).show()
-            ""
+        if (addressList.isNotEmpty()) {
+            val addr = addressList[0].getAddressLine(0)
+            val addrParts = addr.split(" ")
+            Log.d(TAG, "latLngToAddress: ${addrParts}")
+            return "${addrParts[2]} ${addrParts[3]}"
         }
-
+        return ""
     }
+
 
     /**
      * 사용자가 입력한 주소값의 위도 및 경도를 받아옵니다

@@ -1,26 +1,28 @@
 package com.pinslog.ww.viewmodel
 
 import android.os.Build
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.pinslog.ww.data.weatherLatLng.WeatherLatLng
 import com.pinslog.ww.model.ForecastDO
 import com.pinslog.ww.service.WeatherRepository
 import com.pinslog.ww.util.Utility
+import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.disposables.Disposable
 import java.time.LocalDateTime
+import javax.inject.Inject
 
 private const val TAG = "WeatherViewModel"
 
-// TODO Repository Pattern 적용하기
-class WeatherViewModel() : ViewModel() {
+
+@HiltViewModel
+class WeatherViewModel @Inject constructor(private val repository: WeatherRepository) : ViewModel() {
 
     // MutableData
     private var currentMutableData = MutableLiveData<WeatherLatLng?>()
     private var forecastMutableData = MutableLiveData<MutableList<ForecastDO?>?>()
 
-    private val weatherRepository = WeatherRepository()
+    //private val weatherRepository = WeatherRepository()
     private lateinit var disposable: Disposable
 
     init {
@@ -39,7 +41,7 @@ class WeatherViewModel() : ViewModel() {
      * 좌표를 통해 날씨 정보를 받아옵니다.
      */
     fun getCurrentWeatherLatLng(lat: Double, lng: Double) {
-        disposable = weatherRepository.getCurrentWeatherLatLng(lat, lng).subscribe({
+        disposable = repository.getCurrentWeatherLatLng(lat, lng).subscribe({
             currentMutableData.value = it
         }, {
             it.printStackTrace()
@@ -50,7 +52,7 @@ class WeatherViewModel() : ViewModel() {
      * 좌표를 통해 날씨 예보를 받아옵니다.
      */
     fun getForecastLatLng(lat: Double, lng: Double) {
-        disposable = weatherRepository.getForecastLatLng(lat, lng)
+        disposable = repository.getForecastLatLng(lat, lng)
             .subscribe({ it ->
 
                 val weatherList = mutableListOf<ForecastDO?>()

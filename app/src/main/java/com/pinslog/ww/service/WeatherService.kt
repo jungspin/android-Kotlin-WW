@@ -8,7 +8,7 @@ import retrofit2.http.GET
 
 import retrofit2.http.Query
 
-interface WeatherAPI {
+interface WeatherService {
 
     @GET("weather")
     fun getCurrentWeatherLatLng(@Query("lat") lat: Double,

@@ -1,22 +1,22 @@
 package com.pinslog.ww.view
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
 import com.pinslog.ww.R
 import com.pinslog.ww.adapter.ForecastAdapter
 import com.pinslog.ww.base.BaseFragment
-import com.pinslog.ww.config.MyLocation
 import com.pinslog.ww.databinding.FragmentCurrentLocationBinding
 import com.pinslog.ww.databinding.ItemWearingInfoBinding
 import com.pinslog.ww.model.LatLng
+import com.pinslog.ww.util.MyLocation
 import com.pinslog.ww.util.Utility
 import com.pinslog.ww.viewmodel.WeatherViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -24,14 +24,11 @@ import java.util.*
  * @since 2022-11-01
  */
 private const val TAG = "CurrentLocationFragment"
-
+@AndroidEntryPoint
 class CurrentLocationFragment : BaseFragment<FragmentCurrentLocationBinding>() {
 
-    private lateinit var weatherViewModel: WeatherViewModel
-    private var lat: Double = 0.0
-    private var lng: Double = 0.0
+    private val weatherViewModel: WeatherViewModel by viewModels<WeatherViewModel>()
     private lateinit var myLocation: MyLocation
-    private lateinit var latLng: LatLng
     private lateinit var forecastAdapter: ForecastAdapter
     private lateinit var currentWearingInfo: ItemWearingInfoBinding
 
@@ -65,7 +62,6 @@ class CurrentLocationFragment : BaseFragment<FragmentCurrentLocationBinding>() {
     @SuppressLint("SetTextI18n")
     override fun initViewModel() {
         // 뷰모델 프로바이더를 통해 뷰모델 가져오기
-        weatherViewModel = ViewModelProvider(this)[WeatherViewModel::class.java]
         weatherViewModel.getValue.observe(this) {
             if (it != null) {
                 // 현재 온도

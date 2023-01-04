@@ -7,24 +7,26 @@ import com.pinslog.ww.data.weatherLatLng.WeatherLatLng
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
 
-class WeatherRepository () {
+private const val LANG = "kr"
 
-    companion object{
-        const val LANG = "kr"
-    }
+class WeatherRepository @Inject constructor(private val weatherService: WeatherService) {
 
-    private var weatherApi : WeatherAPI = RetrofitInstance.getInstance().create(WeatherAPI::class.java)
-
-    fun getCurrentWeatherLatLng(lat: Double, lng: Double) : Single<WeatherLatLng>{
-        return weatherApi.getCurrentWeatherLatLng(lat, lng, BuildConfig.APP_KEY, LANG)
+    fun getCurrentWeatherLatLng(
+        lat: Double,
+        lon: Double,
+    ): Single<WeatherLatLng> {
+        return weatherService.getCurrentWeatherLatLng(lat, lon, BuildConfig.APP_KEY, LANG)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-
     }
 
-    fun getForecastLatLng(lat: Double, lng: Double) : Single<WeatherResponse>{
-        return weatherApi.getForecastLatLng(lat, lng, BuildConfig.APP_KEY, LANG)
+    fun getForecastLatLng(
+        lat: Double,
+        lon: Double,
+    ): Single<WeatherResponse> {
+        return weatherService.getForecastLatLng(lat, lon, BuildConfig.APP_KEY, LANG)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
     }
