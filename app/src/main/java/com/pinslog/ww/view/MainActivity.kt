@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.Box
 import com.pinslog.ww.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -27,6 +28,9 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+
+
     }
+
 
 }

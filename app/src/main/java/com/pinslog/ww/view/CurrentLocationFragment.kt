@@ -1,6 +1,8 @@
 package com.pinslog.ww.view
 
 import android.annotation.SuppressLint
+import android.content.Intent
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -41,7 +43,6 @@ class CurrentLocationFragment : BaseFragment<FragmentCurrentLocationBinding>() {
         return binding
     }
 
-
     override fun initSetting() {
         myLocation = MyLocation(mContext)
         forecastAdapter = ForecastAdapter()
@@ -51,6 +52,7 @@ class CurrentLocationFragment : BaseFragment<FragmentCurrentLocationBinding>() {
     }
 
     override fun initListener() {
+        binding.mainShareBtn.setOnClickListener(shareBtnClickListener)
         binding.mainLookInfoBtn.setOnClickListener(wearingInfoClickListener)
         binding.mainSwipeRefreshRoot.setOnRefreshListener {
             forecastAdapter.clearItems()
@@ -128,6 +130,18 @@ class CurrentLocationFragment : BaseFragment<FragmentCurrentLocationBinding>() {
             )
             currentWearingInfo.itemInfoRoot.visibility = View.GONE
         }
+    }
+
+    private val shareBtnClickListener = View.OnClickListener {
+        //TODO 수정하기
+        val sendIntent: Intent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, "https://pinslog.page.link/muUh")
+            type = "text/plain"
+        }
+
+        val shareIntent = Intent.createChooser(sendIntent, null)
+        startActivity(shareIntent)
     }
 
 
