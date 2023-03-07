@@ -1,7 +1,10 @@
 package com.pinslog.ww.view
 
 import android.annotation.SuppressLint
+import android.content.ContentResolver
+import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -9,12 +12,15 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
+import com.google.firebase.dynamiclinks.DynamicLink.AndroidParameters
+import com.google.firebase.dynamiclinks.DynamicLink.SocialMetaTagParameters
+import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
+import com.google.firebase.dynamiclinks.ktx.*
 import com.pinslog.ww.R
 import com.pinslog.ww.adapter.ForecastAdapter
 import com.pinslog.ww.base.BaseFragment
 import com.pinslog.ww.databinding.FragmentCurrentLocationBinding
 import com.pinslog.ww.databinding.ItemWearingInfoBinding
-import com.pinslog.ww.model.LatLng
 import com.pinslog.ww.util.MyLocation
 import com.pinslog.ww.util.Utility
 import com.pinslog.ww.viewmodel.WeatherViewModel
@@ -25,7 +31,6 @@ import java.util.*
 /**
  * @since 2022-11-01
  */
-private const val TAG = "CurrentLocationFragment"
 @AndroidEntryPoint
 class CurrentLocationFragment : BaseFragment<FragmentCurrentLocationBinding>() {
 
@@ -114,9 +119,6 @@ class CurrentLocationFragment : BaseFragment<FragmentCurrentLocationBinding>() {
         weatherViewModel.getForecastLatLng(lat, lng)
     }
 
-    /**
-     * 따로 빼두는 것이 좋을까?
-     */
     private val wearingInfoClickListener = View.OnClickListener {
         if (currentWearingInfo.itemInfoRoot.visibility != View.VISIBLE) {
             binding.mainLookInfoBtn.text = "닫기"
@@ -133,16 +135,51 @@ class CurrentLocationFragment : BaseFragment<FragmentCurrentLocationBinding>() {
     }
 
     private val shareBtnClickListener = View.OnClickListener {
-        //TODO 수정하기
+        createDynamicLink()
+    }
+
+    /**
+     * 동적 링크를 생성합니다.
+     */
+    private fun createDynamicLink(){
+        val dynamicLink = FirebaseDynamicLinks.getInstance().createDynamicLink()
+            .setLink(Uri.parse("https://www.pinslog.com/"))
+            .setDomainUriPrefix("https://pinslog.page.link")
+            .setAndroidParameters(AndroidParameters.Builder().build())
+            .setSocialMetaTagParameters(
+                SocialMetaTagParameters.Builder()
+                    .setTitle("Wear Weather")
+                    .setDescription("기온별 옷차림 안내 어플")
+                    .build())
+            .buildShortDynamicLink()
+
+        dynamicLink.addOnSuccessListener {
+            val shortLink = it.shortLink!!
+            createShareContent(shortLink)
+        }
+    }
+
+    /**
+     * 공유할 내용을 생성합니다.
+     *
+     * @param dynamicLink 동적 링크
+     */
+    private fun createShareContent(dynamicLink: Uri){
+        val content = """
+            ${binding.mainCurrentLocation.text}의 현재 기온은 ${binding.mainCurrentTemp.text}°.
+            ${binding.mainCurrentWearinfoRoot.itemWearingDescription.text}를 추천드려요.
+            자세한 정보가 궁금하다면? $dynamicLink
+        """.trimIndent()
+
         val sendIntent: Intent = Intent().apply {
             action = Intent.ACTION_SEND
-            putExtra(Intent.EXTRA_TEXT, "https://pinslog.page.link/muUh")
+            putExtra(Intent.EXTRA_TEXT, content)
             type = "text/plain"
         }
-
         val shareIntent = Intent.createChooser(sendIntent, null)
         startActivity(shareIntent)
     }
+
 
 
 }
