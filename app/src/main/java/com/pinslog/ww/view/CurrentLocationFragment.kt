@@ -8,6 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
 import com.google.firebase.dynamiclinks.DynamicLink.AndroidParameters
@@ -48,6 +50,7 @@ class CurrentLocationFragment : BaseFragment<FragmentCurrentLocationBinding>() {
 
     override fun initSetting() {
         forecastAdapter = ForecastAdapter()
+        binding.mainForecastRv.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         binding.mainForecastRv.adapter = forecastAdapter
 
         binding.mainSwipeRefreshRoot.setColorSchemeResources(R.color.main)
