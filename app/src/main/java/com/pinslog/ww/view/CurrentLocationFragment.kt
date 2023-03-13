@@ -1,14 +1,12 @@
 package com.pinslog.ww.view
 
 import android.annotation.SuppressLint
-import android.content.ContentResolver
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
@@ -34,10 +32,10 @@ import java.util.*
 @AndroidEntryPoint
 class CurrentLocationFragment : BaseFragment<FragmentCurrentLocationBinding>() {
 
-    private val weatherViewModel: WeatherViewModel by viewModels<WeatherViewModel>()
-    private lateinit var myLocation: MyLocation
+    private val weatherViewModel: WeatherViewModel by viewModels()
     private lateinit var forecastAdapter: ForecastAdapter
     private lateinit var currentWearingInfo: ItemWearingInfoBinding
+    private lateinit var myLocation: MyLocation
 
     override fun getBinding(
         inflater: LayoutInflater,
@@ -49,7 +47,6 @@ class CurrentLocationFragment : BaseFragment<FragmentCurrentLocationBinding>() {
     }
 
     override fun initSetting() {
-        myLocation = MyLocation(mContext)
         forecastAdapter = ForecastAdapter()
         binding.mainForecastRv.adapter = forecastAdapter
 
@@ -61,7 +58,7 @@ class CurrentLocationFragment : BaseFragment<FragmentCurrentLocationBinding>() {
         binding.mainLookInfoBtn.setOnClickListener(wearingInfoClickListener)
         binding.mainSwipeRefreshRoot.setOnRefreshListener {
             forecastAdapter.clearItems()
-            initData()
+            doNextAfterGranted()
             binding.mainSwipeRefreshRoot.isRefreshing = false
         }
     }
@@ -74,12 +71,12 @@ class CurrentLocationFragment : BaseFragment<FragmentCurrentLocationBinding>() {
                 // 현재 온도
                 val weatherInfo = it.main
                 val temp = Utility.getRealTemp(weatherInfo.temp)
-                binding.mainCurrentTemp.text = "${temp}"
+                binding.mainCurrentTemp.text = temp
 
                 // 현재 시간
-                val dateFormat = SimpleDateFormat("yyyy년 MM월 dd일 hh시 mm분", Locale.KOREAN)
-                val date = dateFormat.format(Calendar.getInstance().time)
-                binding.mainCurrentTime.text = "$date"
+                val nowDate = Date(System.currentTimeMillis())
+                val dateFormat = SimpleDateFormat("yyyy년 MM월 dd일 E요일 HH시 mm분", Locale("ko", "KR"))
+                binding.mainCurrentTime.text = dateFormat.format(nowDate)
 
                 // 옷 정보 설정
                 val wearInfo = Utility.getWearingInfo(mContext, temp)
@@ -104,9 +101,8 @@ class CurrentLocationFragment : BaseFragment<FragmentCurrentLocationBinding>() {
         }
     }
 
-    // TODO splash 로 옮기기
-    @SuppressLint("SetTextI18n")
-    override fun initData() {
+    override fun doNextAfterGranted() {
+        myLocation = MyLocation(mContext)
         // 좌표
         val latLng = myLocation.getCurrentLatLng()
         val lat = latLng.lat
@@ -142,7 +138,7 @@ class CurrentLocationFragment : BaseFragment<FragmentCurrentLocationBinding>() {
      * 동적 링크를 생성합니다.
      */
     private fun createDynamicLink(){
-        val dynamicLink = FirebaseDynamicLinks.getInstance().createDynamicLink()
+        FirebaseDynamicLinks.getInstance().createDynamicLink()
             .setLink(Uri.parse("https://www.pinslog.com/"))
             .setDomainUriPrefix("https://pinslog.page.link")
             .setAndroidParameters(AndroidParameters.Builder().build())
@@ -152,11 +148,13 @@ class CurrentLocationFragment : BaseFragment<FragmentCurrentLocationBinding>() {
                     .setDescription("기온별 옷차림 안내 어플")
                     .build())
             .buildShortDynamicLink()
-
-        dynamicLink.addOnSuccessListener {
-            val shortLink = it.shortLink!!
-            createShareContent(shortLink)
-        }
+            .addOnSuccessListener {
+                val shortLink = it.shortLink!!
+                createShareSheet(shortLink)
+            }
+            .addOnFailureListener {
+                Toast.makeText(mContext, "일시적 문제로 데이터를 공유할 수 없습니다.", Toast.LENGTH_SHORT).show()
+            }
     }
 
     /**
@@ -164,7 +162,7 @@ class CurrentLocationFragment : BaseFragment<FragmentCurrentLocationBinding>() {
      *
      * @param dynamicLink 동적 링크
      */
-    private fun createShareContent(dynamicLink: Uri){
+    private fun createShareSheet(dynamicLink: Uri){
         val content = """
             ${binding.mainCurrentLocation.text}의 현재 기온은 ${binding.mainCurrentTemp.text}°.
             ${binding.mainCurrentWearinfoRoot.itemWearingDescription.text}를 추천드려요.

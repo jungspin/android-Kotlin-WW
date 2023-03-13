@@ -1,6 +1,7 @@
 package com.pinslog.ww.viewmodel
 
 import android.os.Build
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.pinslog.ww.data.weatherLatLng.WeatherLatLng
@@ -19,8 +20,8 @@ private const val TAG = "WeatherViewModel"
 class WeatherViewModel @Inject constructor(private val repository: WeatherRepository) : ViewModel() {
 
     // MutableData
-    private var currentMutableData = MutableLiveData<WeatherLatLng?>()
-    private var forecastMutableData = MutableLiveData<MutableList<ForecastDO?>?>()
+    private var currentMutableData = SingleLiveEvent<WeatherLatLng?>()
+    private var forecastMutableData = SingleLiveEvent<MutableList<ForecastDO?>?>()
 
     //private val weatherRepository = WeatherRepository()
     private lateinit var disposable: Disposable
@@ -54,12 +55,11 @@ class WeatherViewModel @Inject constructor(private val repository: WeatherReposi
     fun getForecastLatLng(lat: Double, lng: Double) {
         disposable = repository.getForecastLatLng(lat, lng)
             .subscribe({ it ->
-
                 val weatherList = mutableListOf<ForecastDO?>()
                 it.list.filter {
                     isBeforeForecast(it.dt_txt)
                 }
-                var pop = 0
+                var pop = 0.0
                 it.list.forEach {
                     val dt = it.dt_txt.split(" ")
                     val dateArray = dt[0].split("-")
@@ -67,7 +67,7 @@ class WeatherViewModel @Inject constructor(private val repository: WeatherReposi
                     val date = dateArray[2]
 
                     it.date = "$month-$date"
-                    pop = (it.pop * 100).toInt()
+                    pop = it.pop * 100
                 }
 
                 val tmp = it.list.groupBy { it.date }
@@ -108,14 +108,12 @@ class WeatherViewModel @Inject constructor(private val repository: WeatherReposi
             }) { it.printStackTrace() }
     }
 
-
-    // 이게..의미가 있나..? 일단은 그냥 두는게..나을지도
     private fun isBeforeForecast(dateText: String): Boolean {
         val dateTextParts = dateText.split(" ")
         val datePart = dateTextParts[0].split("-")
         val timePart = dateTextParts[1].split(":")
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val forecastDate = LocalDateTime.of(
                 datePart[0].toInt(),
                 datePart[1].toInt(),
@@ -124,10 +122,9 @@ class WeatherViewModel @Inject constructor(private val repository: WeatherReposi
                 0
             )
             val currentDate = LocalDateTime.now()
-            return forecastDate.isBefore(currentDate)
+            forecastDate.isBefore(currentDate)
         } else {
-            // TODO 구현
-            return false
+            false
         }
 
     }

@@ -9,7 +9,7 @@ class ForecastDO constructor(
     var id: Int,
     var maxTemp: String,
     var minTemp: String,
-    val pop:Int,
+    val pop: Double,
 ) {
     private val calendar = Calendar.getInstance()
     val dateString : String
@@ -20,7 +20,8 @@ class ForecastDO constructor(
     }
     val day: String
         get() {
-            calendar.set(Calendar.YEAR, (month.toInt() - 1), date.toInt())
+            calendar.time = Date(System.currentTimeMillis())
+            calendar.set(calendar.get(Calendar.YEAR), (month.toInt() - 1), date.toInt())
             return when (calendar.get(Calendar.DAY_OF_WEEK)) {
                 1 -> "일"
                 2 -> "월"

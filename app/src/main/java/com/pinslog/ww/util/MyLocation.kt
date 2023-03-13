@@ -5,14 +5,10 @@ import android.content.Context
 import android.content.Intent
 import android.location.*
 import android.provider.Settings
-import android.util.Log
 import android.widget.Toast
 import com.pinslog.ww.model.LatLng
-import dagger.hilt.android.qualifiers.ActivityContext
 
-private const val TAG = "MyLocation"
-
-class MyLocation(val mContext: Context) {
+class MyLocation(private val mContext: Context) {
     var currentLocation: Location? = null
     var latLng = LatLng(0.0, 0.0)
 
@@ -61,7 +57,6 @@ class MyLocation(val mContext: Context) {
         LocationListener { location ->
             latLng.lat = location.latitude
             latLng.lng = location.longitude
-            Log.d(TAG, ": ${location.latitude}, ${location.longitude}")
         }
 
 
@@ -77,15 +72,14 @@ class MyLocation(val mContext: Context) {
 
         try {
             addressList = geocoder.getFromLocation(lat, lng, 10)
-            Log.d(TAG, "latLngToAddress: ${addressList}")
         } catch (e: Exception) {
+            Toast.makeText(mContext, "예상치 못한 오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
             e.printStackTrace()
         }
 
         if (addressList.isNotEmpty()) {
             val addr = addressList[0].getAddressLine(0)
             val addrParts = addr.split(" ")
-            Log.d(TAG, "latLngToAddress: ${addrParts}")
             return "${addrParts[2]} ${addrParts[3]}"
         }
         return ""

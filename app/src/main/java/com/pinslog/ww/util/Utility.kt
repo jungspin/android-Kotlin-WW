@@ -1,6 +1,5 @@
 package com.pinslog.ww.util
 
-import android.animation.Animator
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
 import android.content.Context
@@ -8,9 +7,6 @@ import android.view.View
 import androidx.core.animation.doOnEnd
 import com.pinslog.ww.R
 import com.pinslog.ww.model.WearInfo
-import java.lang.Exception
-import kotlin.math.floor
-import kotlin.math.round
 
 // TODO lazy load 되게 만들기
 object Utility {
@@ -129,7 +125,7 @@ object Utility {
      * 의복 설명 문자열을 반환합니다.
      */
     private fun getDescription(mContext: Context, id: Int): String {
-        return "${mContext.getString(id)}"
+        return mContext.getString(id)
     }
 
     /**

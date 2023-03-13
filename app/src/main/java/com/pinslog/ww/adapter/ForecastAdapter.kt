@@ -87,7 +87,7 @@ class ForecastAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             binding.itemForecastMinTemp.text = "${forecastDO?.minTemp}°"
 
             val pop = forecastDO?.pop
-            if (pop == 0) {
+            if (pop == 0.0) {
                 binding.itemForecastPopRoot.visibility = View.GONE
             } else {
                 binding.itemForecastPop.text = "${forecastDO?.pop}"
