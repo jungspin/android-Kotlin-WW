@@ -11,7 +11,7 @@
     <uses-feature android:name="android.hardware.location.network" />
 
     <application
-        android:name=".config.WwApplication"
+        android:name=".base.WwApplication"
         android:allowBackup="true"
         android:debuggable="true"
         android:icon="@mipmap/ic_launcher_foreground"
@@ -23,7 +23,7 @@
         tools:ignore="HardcodedDebugMode"
         tools:targetApi="m">
         <activity
-            android:name=".view.SplashActivity"
+            android:name=".presentation.view.SplashActivity"
             android:exported="true"
             android:theme="@style/SplashTheme">
             <intent-filter>
@@ -33,10 +33,10 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".view.BookmarkActivity"
+            android:name=".presentation.view.BookmarkActivity"
             android:exported="false" />
         <activity
-            android:name=".view.MainActivity"
+            android:name=".presentation.view.MainActivity"
             android:exported="true"/>
     </application>
 

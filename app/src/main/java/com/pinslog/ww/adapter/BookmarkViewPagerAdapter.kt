@@ -4,8 +4,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.pinslog.ww.view.BookmarkFragment
-import com.pinslog.ww.view.SearchFragment
+import com.pinslog.ww.presentation.view.BookmarkFragment
+import com.pinslog.ww.presentation.view.SearchFragment
 
 const val NUMBERS_OF_TAB = 2
 class BookmarkViewPagerAdapter(fragmentManager: FragmentManager, lifecycle: Lifecycle) :

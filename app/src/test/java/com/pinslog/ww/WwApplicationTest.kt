@@ -42,7 +42,7 @@ class WwApplicationTest {
     @Test
     fun kToCTest(){
         val temp = 274.69
-        println(Utility.getRealTemp(temp))
+        println(Utility.getRealTempAsString(temp))
     }
 
     @Test

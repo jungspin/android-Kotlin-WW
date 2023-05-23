@@ -68,7 +68,7 @@ abstract class BaseFragment<VB : ViewBinding> : Fragment() {
      * - ACCESS_FINE_LOCATION
      * - ACCESS_COARSE_LOCATION
      */
-    private fun checkPermission(){
+    protected fun checkPermission(){
         val requirePermissions = arrayOf(
             ACCESS_FINE_LOCATION,
             ACCESS_COARSE_LOCATION

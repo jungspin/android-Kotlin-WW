@@ -46,7 +46,8 @@
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintHorizontal_weight="0.5"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="05.23"/>
 
                 <TextView
                     android:id="@+id/item_forecast_day"
@@ -59,7 +60,8 @@
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintHorizontal_weight="0.5"
                     app:layout_constraintStart_toEndOf="@+id/item_forecast_date"
-                    app:layout_constraintTop_toTopOf="@+id/item_forecast_date" />
+                    app:layout_constraintTop_toTopOf="@+id/item_forecast_date"
+                    tools:text="화"/>
 
                 <ImageView
                     android:id="@+id/item_forecast_icon"
@@ -73,7 +75,8 @@
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintHorizontal_weight="0.5"
                     app:layout_constraintStart_toEndOf="@+id/item_forecast_day"
-                    app:layout_constraintTop_toTopOf="@+id/item_forecast_day" />
+                    app:layout_constraintTop_toTopOf="@+id/item_forecast_day"
+                    tools:src="@drawable/ic_clear"/>
 
                 <TextView
                     android:id="@+id/item_forecast_max_temp"
@@ -85,7 +88,8 @@
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintHorizontal_weight="0.5"
                     app:layout_constraintStart_toEndOf="@+id/item_forecast_icon"
-                    app:layout_constraintTop_toTopOf="@+id/item_forecast_date" />
+                    app:layout_constraintTop_toTopOf="@+id/item_forecast_date"
+                    tools:text="22"/>
 
                 <TextView
                     android:id="@+id/item_forecast_min_temp"
@@ -99,7 +103,8 @@
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintHorizontal_weight="0.5"
                     app:layout_constraintStart_toEndOf="@+id/item_forecast_max_temp"
-                    app:layout_constraintTop_toTopOf="@+id/item_forecast_max_temp" />
+                    app:layout_constraintTop_toTopOf="@+id/item_forecast_max_temp"
+                    tools:text="16"/>
 
                 <ImageView
                     android:id="@+id/item_info_arrow_iv"

@@ -2,7 +2,6 @@ package com.pinslog.ww.adapter
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,16 +19,6 @@ class ForecastAdapter : BaseRecyclerAdapter<ItemForecastBinding, ForecastDO?>() 
 
     private lateinit var mContext: Context
 
-    /**
-     * item 들을 삭제합니다.
-     */
-    @SuppressLint("NotifyDataSetChanged")
-    fun clearItems() {
-        notifyItemRangeRemoved(0, dataList.size - 1)
-        dataList.clear()
-        notifyDataSetChanged()
-    }
-
     override fun getViewBinding(
         layoutInflater: LayoutInflater,
         parent: ViewGroup
@@ -40,25 +29,17 @@ class ForecastAdapter : BaseRecyclerAdapter<ItemForecastBinding, ForecastDO?>() 
 
     override fun itemClickListener(
         viewHolder: BaseViewHolder<ItemForecastBinding>,
-        t: ForecastDO?,
+        data: ForecastDO?,
         position: Int
     ) {
-        if (binding.itemWearingRoot.visibility != View.VISIBLE) {
-            binding.itemInfoArrowIv.setImageResource(R.drawable.ic_arrow_up)
-            TransitionManager.beginDelayedTransition(binding.materialCardView, AutoTransition())
-            binding.itemWearingRoot.visibility = View.VISIBLE
-        } else {
-            binding.itemInfoArrowIv.setImageResource(R.drawable.ic_arrow_down)
-            TransitionManager.beginDelayedTransition(binding.itemWearingRoot, AutoTransition())
-            binding.itemWearingRoot.visibility = View.GONE
+        viewHolder.vb?.run {
+            setInfoVisibility(this)
         }
     }
 
     @SuppressLint("SetTextI18n")
     override fun bind(viewHolder: BaseViewHolder<ItemForecastBinding>, data: ForecastDO?) {
         viewHolder.vb?.run {
-            this.itemForecastRoot.setOnClickListener(callClickListener(viewHolder))
-            this.itemInfoArrowIv.setOnClickListener(callClickListener(viewHolder))
             this.itemForecastDate.text = "${data?.dateString}"
             this.itemForecastDay.text = "${data?.day}"
             data?.resourceId.let {
@@ -77,43 +58,34 @@ class ForecastAdapter : BaseRecyclerAdapter<ItemForecastBinding, ForecastDO?>() 
                 this.itemForecastPopRoot.visibility = View.VISIBLE
             }
 
-
-            getTemp(data?.maxTemp.toString())
+            getTemp(data?.maxTemp.toString(), this)
             this.itemWearingMaxBtn.setOnClickListener {
-                getTemp(data?.maxTemp.toString())
+                getTemp(data?.maxTemp.toString(), this)
             }
             this.itemWearingMinBtn.setOnClickListener {
-                getTemp(data?.minTemp.toString())
-            }
-        }
-        
-
-        
-    }
-
-    private fun callClickListener(viewHolder: BaseViewHolder<ItemForecastBinding>): View.OnClickListener {
-        val binding = viewHolder.vb!!
-        return View.OnClickListener {
-            if (binding.itemWearingRoot.visibility != View.VISIBLE) {
-                binding.itemInfoArrowIv.setImageResource(R.drawable.ic_arrow_up)
-                TransitionManager.beginDelayedTransition(binding.materialCardView, AutoTransition())
-                binding.itemWearingRoot.visibility = View.VISIBLE
-            } else {
-                binding.itemInfoArrowIv.setImageResource(R.drawable.ic_arrow_down)
-                TransitionManager.beginDelayedTransition(binding.itemWearingRoot, AutoTransition())
-                binding.itemWearingRoot.visibility = View.GONE
+                getTemp(data?.minTemp.toString(), this)
             }
         }
     }
 
-    @SuppressLint("NotifyDataSetChanged")
+    private fun setInfoVisibility(binding: ItemForecastBinding) {
+        if (binding.itemWearingRoot.visibility != View.VISIBLE) {
+            binding.itemInfoArrowIv.setImageResource(R.drawable.ic_arrow_up)
+            TransitionManager.beginDelayedTransition(binding.materialCardView, AutoTransition())
+            binding.itemWearingRoot.visibility = View.VISIBLE
+        } else {
+            binding.itemInfoArrowIv.setImageResource(R.drawable.ic_arrow_down)
+            TransitionManager.beginDelayedTransition(binding.itemWearingRoot, AutoTransition())
+            binding.itemWearingRoot.visibility = View.GONE
+        }
+    }
+
     override fun setItems(dataList: MutableList<ForecastDO?>) {
         this.dataList.addAll(dataList)
         notifyItemRangeInserted(0, dataList.size - 1)
-        //notifyDataSetChanged()
     }
 
-    private fun getTemp(temp: String) {
+    private fun getTemp(temp: String, binding: ItemForecastBinding) {
         val wearInfo = Utility.getWearingInfo(mContext, temp)
         val infoList = wearInfo.wearingList
         val wearingInfoBinding = binding.itemWearingInfoRoot

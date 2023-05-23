@@ -10,14 +10,15 @@ class ForecastDO constructor(
     var maxTemp: String,
     var minTemp: String,
     val pop: Double,
+    val hourlyMap: MutableMap<String, Int>
 ) {
     private val calendar = Calendar.getInstance()
     val dateString : String
-    get() = "$month.$date"
+        get() = "$month.$date"
     val resourceId : Int
-    get() {
-        return Utility.setCodeToImg(id)
-    }
+        get() {
+            return Utility.setCodeToImg(id)
+        }
     val day: String
         get() {
             calendar.time = Date(System.currentTimeMillis())
@@ -35,7 +36,7 @@ class ForecastDO constructor(
         }
 
     override fun toString(): String {
-        return "ForecastDO(month='$month', date='$date', resourceId=$resourceId, maxTemp='$maxTemp', minTemp='$minTemp', day='$day')"
+        return "ForecastDO(month='$month', date='$date', resourceId=$resourceId, maxTemp='$maxTemp', minTemp='$minTemp', day='$day', hour='${hourlyMap.entries.joinToString()})"
     }
 
 

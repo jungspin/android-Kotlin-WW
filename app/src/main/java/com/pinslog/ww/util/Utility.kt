@@ -14,9 +14,13 @@ object Utility {
     /**
      * 켈빈을 섭씨로 변환합니다.
      */
-    fun getRealTemp(temp: Double): String {
+    fun getRealTempAsString(temp: Double): String {
         val c = temp - 273.15
         return c.toInt().toString()
+    }
+
+    fun getRealTemp(temp: Double): Int {
+        return (temp - 273.15).toInt()
     }
 
     /**
