@@ -6,7 +6,10 @@ import androidx.lifecycle.ViewModel
 import com.pinslog.ww.data.model.weatherLatLng.WeatherLatLng
 import com.pinslog.ww.model.ForecastDO
 import com.pinslog.ww.domain.usecase.WeatherUseCase
+import com.pinslog.ww.presentation.model.CurrentWeather
+import com.pinslog.ww.util.CURRENT_TIME_PATTERN
 import com.pinslog.ww.util.Utility
+import com.pinslog.ww.util.toDate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.disposables.Disposable
 import java.time.LocalDateTime
@@ -19,7 +22,7 @@ private const val TAG = "WeatherViewModel"
 class WeatherViewModel @Inject constructor(private val weatherUseCase: WeatherUseCase) : ViewModel() {
 
     // MutableData
-    private var currentMutableData = SingleLiveEvent<WeatherLatLng?>()
+    private var currentMutableData = SingleLiveEvent<CurrentWeather?>()
     private var forecastMutableData = SingleLiveEvent<MutableList<ForecastDO?>?>()
 
     //private val weatherRepository = WeatherRepository()
@@ -30,7 +33,7 @@ class WeatherViewModel @Inject constructor(private val weatherUseCase: WeatherUs
         forecastMutableData.value = null
     }
 
-    val getValue: MutableLiveData<WeatherLatLng?>
+    val getValue: MutableLiveData<CurrentWeather?>
         get() = currentMutableData
 
     val getForecastValue: MutableLiveData<MutableList<ForecastDO?>?>
@@ -42,7 +45,16 @@ class WeatherViewModel @Inject constructor(private val weatherUseCase: WeatherUs
      */
     fun getCurrentWeatherLatLng(lat: Double, lng: Double) {
         disposable = weatherUseCase.getCurrentWeatherLatLng(lat, lng).subscribe({
-            currentMutableData.value = it
+            val currentTemp = it.main.temp
+            val currentTime = System.currentTimeMillis().toDate(CURRENT_TIME_PATTERN)
+            // 옷 정보 설정
+            val wearInfo = Utility.getWearingInfo(currentTemp)
+
+            val weather = it.weather[0]
+            val weatherIcon = Utility.setCodeToImg(weather.id)
+            val weatherDescription = weather.description
+
+            currentMutableData.value = CurrentWeather(currentTemp.toString(), currentTime, wearInfo, weatherIcon, weatherDescription)
         }, {
             it.printStackTrace()
         })

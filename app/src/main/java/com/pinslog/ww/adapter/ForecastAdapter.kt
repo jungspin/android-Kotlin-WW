@@ -86,7 +86,7 @@ class ForecastAdapter : BaseRecyclerAdapter<ItemForecastBinding, ForecastDO?>() 
     }
 
     private fun getTemp(temp: String, binding: ItemForecastBinding) {
-        val wearInfo = Utility.getWearingInfo(mContext, temp)
+        val wearInfo = Utility.getWearingInfo(temp.toDouble())
         val infoList = wearInfo.wearingList
         val wearingInfoBinding = binding.itemWearingInfoRoot
         wearingInfoBinding.itemWearingDescription.text = wearInfo.infoDescription

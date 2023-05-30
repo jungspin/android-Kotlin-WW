@@ -63,12 +63,13 @@ object Utility {
     /**
      * 의복정보를 반환합니다.
      */
-    fun getWearingInfo(mContext: Context, tempString: String): WearInfo {
+    fun getWearingInfo(temp: Double): WearInfo {
         var wearDescription = ""
         var wearInfoList: ArrayList<Int> = arrayListOf()
-        val temp = tempString.toDouble()
+        val temp = temp.toDouble()
         if (temp >= 28.0) {
-            wearDescription = mContext.getString(R.string.description_28)
+            //wearDescription = mContext.getString(R.string.description_28)
+            wearDescription = "민소매, 반팔, 반바지, 원피스"
             wearInfoList = arrayListOf(
                 R.drawable.ic_sleeve,
                 R.drawable.ic_half_pants,
@@ -77,7 +78,8 @@ object Utility {
         }
         when (temp) {
             in 23.0..27.0 -> {
-                wearDescription = getDescription(mContext, R.string.description_23)
+                //wearDescription = getDescription(mContext, R.string.description_23)
+                wearDescription = "반팔, 얇은 셔츠, 반바지, 면바지"
                 wearInfoList = arrayListOf(
                     R.drawable.ic_half_sleeve,
                     R.drawable.ic_half_pants,
@@ -85,7 +87,8 @@ object Utility {
                 )
             }
             in 20.0..22.0 -> {
-                wearDescription = getDescription(mContext, R.string.description_20)
+                //wearDescription = getDescription(mContext, R.string.description_20)
+                wearDescription = "얇은 가디건, 긴팔, 면바지, 청바지"
                 wearInfoList = arrayListOf(
                     R.drawable.ic_light_cardigan,
                     R.drawable.ic_cotton_pants,
@@ -93,36 +96,37 @@ object Utility {
                 )
             }
             in 17.0..19.0 -> {
-                wearDescription = getDescription(mContext, R.string.description_17)
+                //wearDescription = getDescription(mContext, R.string.description_17)
+                wearDescription = "얇은 니트, 맨투맨, 가디건, 청바지"
                 wearInfoList =
                     arrayListOf(R.drawable.ic_light_knit, R.drawable.ic_jean, R.drawable.ic_mtm)
             }
             in 12.0..16.0 -> {
-                wearDescription = getDescription(mContext, R.string.description_12)
+                //wearDescription = getDescription(mContext, R.string.description_12)
+                wearDescription = "자켓, 가디건, 야상, 스타킹, 청바지, 면바지"
                 wearInfoList =
                     arrayListOf(R.drawable.ic_jacket_2, R.drawable.ic_jean, R.drawable.ic_cardigan)
             }
             in 9.0..11.0 -> {
-                wearDescription = getDescription(mContext, R.string.description_9)
+                //wearDescription = getDescription(mContext, R.string.description_9)
+                wearDescription = "자켓, 트렌치코트, 야상, 니트, 청바지, 스타킹"
                 wearInfoList =
                     arrayListOf(R.drawable.ic_jacket_2, R.drawable.ic_coat, R.drawable.ic_knit)
             }
             in 5.0..8.0 -> {
-                wearDescription = getDescription(mContext, R.string.description_5)
+                //wearDescription = getDescription(mContext, R.string.description_5)
+                wearDescription = "코트, 가죽자켓, 히트텍, 니트, 레깅스"
                 wearInfoList =
                     arrayListOf(R.drawable.ic_knit, R.drawable.ic_coat, R.drawable.ic_jacket)
             }
         }
         if (temp <= 4.0) {
-            wearDescription = getDescription(mContext, R.string.description_4)
+            //wearDescription = getDescription(mContext, R.string.description_4)
+            wearDescription = "패딩, 두꺼운 코트, 목도리, 기모제품"
             wearInfoList =
                 arrayListOf(R.drawable.ic_safari, R.drawable.ic_hat, R.drawable.ic_muffler)
         }
         return WearInfo(wearDescription, wearInfoList)
-//        binding.mainWearingInfo.itemWearingDescription.text = wearDescription
-//        binding.mainWearingInfo.itemWearing1.setImageResource(wearInfoList[0])
-//        binding.mainWearingInfo.itemWearing2.setImageResource(wearInfoList[1])
-//        binding.mainWearingInfo.itemWearing3.setImageResource(wearInfoList[2])
     }
 
     /**
