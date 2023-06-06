@@ -1,6 +1,8 @@
 package com.pinslog.ww.presentation.viewmodel
 
 import android.os.Build
+import android.widget.ImageView
+import androidx.databinding.BindingAdapter
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.pinslog.ww.data.model.weatherLatLng.WeatherLatLng
@@ -54,7 +56,7 @@ class WeatherViewModel @Inject constructor(private val weatherUseCase: WeatherUs
             val weatherIcon = Utility.setCodeToImg(weather.id)
             val weatherDescription = weather.description
 
-            currentMutableData.value = CurrentWeather(currentTemp.toString(), currentTime, wearInfo, weatherIcon, weatherDescription)
+            currentMutableData.value = CurrentWeather(Utility.getRealTempAsString(currentTemp), currentTime, wearInfo, weatherIcon, weatherDescription)
         }, {
             it.printStackTrace()
         })

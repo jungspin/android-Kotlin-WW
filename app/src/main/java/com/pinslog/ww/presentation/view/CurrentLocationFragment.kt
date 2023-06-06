@@ -3,6 +3,7 @@ package com.pinslog.ww.presentation.view
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -67,32 +68,8 @@ class CurrentLocationFragment : BaseFragment<FragmentCurrentLocationBinding>() {
 
     @SuppressLint("SetTextI18n")
     override fun initViewModel() {
-        // 뷰모델 프로바이더를 통해 뷰모델 가져오기
-//        weatherViewModel.getValue.observe(this) {
-//            if (it != null) {
-//                // 현재 온도
-//                val weatherInfo = it.main
-//                val temp = Utility.getRealTempAsString(weatherInfo.temp)
-//                binding.mainCurrentTemp.text = temp
-//
-//                // 현재 시간
-//                binding.mainCurrentTime.text = System.currentTimeMillis().toDate(CURRENT_TIME_PATTERN)
-//
-//                // 옷 정보 설정
-//                val wearInfo = Utility.getWearingInfo(weatherInfo.temp)
-//                currentWearingInfo.itemWearingDescription.text = wearInfo.infoDescription
-//                val infoList = wearInfo.wearingList
-//
-//                currentWearingInfo.itemWearing1.setImageResource(infoList[0])
-//                currentWearingInfo.itemWearing2.setImageResource(infoList[1])
-//                currentWearingInfo.itemWearing3.setImageResource(infoList[2])
-//
-//                // 날씨 아이콘 설정
-//                binding.mainWeatherImg.setImageResource(Utility.setCodeToImg(it.weather[0].id))
-//                // 날씨 설명
-//                binding.mainWeatherDescription.text = it.weather[0].description
-//            }
-//        }
+        binding.weatherViewModel = weatherViewModel
+        binding.lifecycleOwner = this
 
         weatherViewModel.getForecastValue.observe(this) { data ->
             if (data != null) {

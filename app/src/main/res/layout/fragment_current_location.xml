@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:bind="http://schemas.android.com/apk/res-auto">
     <data>
         <variable
             name="weatherViewModel"
             type="com.pinslog.ww.presentation.viewmodel.WeatherViewModel" />
     </data>
 
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/main_swipe_refresh_root"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -76,7 +78,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="150dp"
                             android:padding="4dp"
-                            android:src="@{weatherViewModel.getValue.weatherIcon}"
+                            app:imageRes="@{weatherViewModel.getValue.weatherIcon}"
                             tools:src="@drawable/ic_clear"/>
 
                         <androidx.constraintlayout.widget.ConstraintLayout
@@ -118,8 +120,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:textAppearance="?attr/textAppearanceBody2"
-                            android:text="@{weatherViewModel.getValue.wearInfo.infoDescription}"
-                            tools:text="@string/description_12"/>
+                            android:text="@{weatherViewModel.getValue.weatherDescription}"
+                            tools:text="@string/main_weather_description"/>
 
                         <androidx.appcompat.widget.LinearLayoutCompat
                             android:id="@+id/main_btn_root"
@@ -146,6 +148,7 @@
                         <include
                             android:id="@+id/main_current_wearinfo_root"
                             layout="@layout/item_wearing_info"
+                            bind:wearInfo="@{weatherViewModel.getValue.wearInfo}"
                             android:visibility="gone" />
                     </androidx.appcompat.widget.LinearLayoutCompat>
                 </com.google.android.material.card.MaterialCardView>
