@@ -54,6 +54,7 @@
                             style="@style/BaseTextView"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:text="@{weatherViewModel.getValue.currentLocation}"
                             android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"

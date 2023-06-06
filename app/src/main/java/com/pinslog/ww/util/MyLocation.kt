@@ -5,12 +5,26 @@ import android.content.Context
 import android.content.Intent
 import android.location.*
 import android.provider.Settings
+import android.util.Log
 import android.widget.Toast
+import androidx.core.content.ContextCompat.getSystemService
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.pinslog.ww.model.LatLng
 
+private const val TAG = "GpsTest"
 class MyLocation(private val mContext: Context) {
     var currentLocation: Location? = null
     var latLng = LatLng(0.0, 0.0)
+
+    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+    private lateinit var locationManager: LocationManager
+
+    init {
+        // 위치 서비스 클라이언트 만들기
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(mContext)
+        locationManager = mContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+    }
 
     /**
      * 현재 좌표를 구합니다.
@@ -28,7 +42,25 @@ class MyLocation(private val mContext: Context) {
             // 이전 저장 위치 받아오기
             val location: Location? =
                 locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+            Log.d(TAG, "GPS_PROVIDER : ${location?.latitude}, ${location?.longitude}")
+
+            fusedLocationProviderClient.lastLocation
+                .addOnSuccessListener { location ->
+                    val currentLocation = LatLng(location.latitude, location.longitude)
+                    latLng = currentLocation
+
+                    Log.d(TAG, "======== FUSED_LOCATION_CLIENT =======")
+                    Log.d(TAG, "LatLng: ${currentLocation}")
+                    Log.d(TAG, "bearing: ${location.bearing}")
+                    Log.d(TAG, "accuracy: ${location.accuracy}")
+                    Log.d(TAG, "speed: ${location.speed}")
+                    Log.d(TAG, "=============================")
+
+                }
+
             if (location == null) {
+                // 마지막으로 알려진 위치
+
                 // null 이면 requestLocationUpdates 호출
                 locationManager.requestLocationUpdates(
                     LocationManager.GPS_PROVIDER,
@@ -39,6 +71,7 @@ class MyLocation(private val mContext: Context) {
                 // network provider 로 대략적인 위치정보 받아오기
                 val networkLocation =
                     locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
+                Log.d(TAG, "NETWORK_PROVIDER : ${networkLocation?.latitude}, ${networkLocation?.longitude}")
                 if (networkLocation == null) {
                     Toast.makeText(mContext, "현재 위치 정보를 가져올 수 없어요", Toast.LENGTH_SHORT).show()
                 } else {
@@ -50,6 +83,7 @@ class MyLocation(private val mContext: Context) {
                 latLng.lng = location.longitude
             }
         }
+        Log.d(TAG, "return $latLng")
         return latLng
     }
 

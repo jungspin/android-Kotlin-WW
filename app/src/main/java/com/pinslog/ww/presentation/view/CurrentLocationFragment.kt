@@ -1,7 +1,10 @@
 package com.pinslog.ww.presentation.view
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
+import android.location.Geocoder
+import android.location.LocationManager
 import android.net.Uri
 import android.util.Log
 import android.view.LayoutInflater
@@ -13,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
+import com.google.android.gms.location.LocationServices
 import com.google.firebase.dynamiclinks.DynamicLink.AndroidParameters
 import com.google.firebase.dynamiclinks.DynamicLink.SocialMetaTagParameters
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
@@ -71,6 +75,11 @@ class CurrentLocationFragment : BaseFragment<FragmentCurrentLocationBinding>() {
         binding.weatherViewModel = weatherViewModel
         binding.lifecycleOwner = this
 
+        val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(mContext)
+        val locationManager = mContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val geocoder = Geocoder(mContext)
+        weatherViewModel.getCurrentLocation(locationManager, fusedLocationProviderClient, geocoder)
+
         weatherViewModel.getForecastValue.observe(this) { data ->
             if (data != null) {
                 forecastAdapter.setItems(data)
@@ -85,10 +94,9 @@ class CurrentLocationFragment : BaseFragment<FragmentCurrentLocationBinding>() {
         val lat = latLng.lat
         val lng = latLng.lng
         // 위치 이름 설정
-        val address = myLocation.latLngToAddress(latLng.lat, latLng.lng)
-        binding.mainCurrentLocation.text = address
+//        val address = myLocation.latLngToAddress(latLng.lat, latLng.lng)
+//        binding.mainCurrentLocation.text = address
 
-        weatherViewModel.getCurrentWeatherLatLng(lat, lng)
         weatherViewModel.getForecastLatLng(lat, lng)
     }
 

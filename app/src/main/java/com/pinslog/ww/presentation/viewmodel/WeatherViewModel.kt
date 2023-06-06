@@ -1,13 +1,22 @@
 package com.pinslog.ww.presentation.viewmodel
 
+import android.annotation.SuppressLint
+import android.location.Address
+import android.location.Geocoder
+import android.location.LocationManager
 import android.os.Build
+import android.util.Log
 import android.widget.ImageView
+import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.databinding.BindingAdapter
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.google.android.gms.location.FusedLocationProviderClient
 import com.pinslog.ww.data.model.weatherLatLng.WeatherLatLng
 import com.pinslog.ww.model.ForecastDO
 import com.pinslog.ww.domain.usecase.WeatherUseCase
+import com.pinslog.ww.model.LatLng
 import com.pinslog.ww.presentation.model.CurrentWeather
 import com.pinslog.ww.util.CURRENT_TIME_PATTERN
 import com.pinslog.ww.util.Utility
@@ -41,11 +50,34 @@ class WeatherViewModel @Inject constructor(private val weatherUseCase: WeatherUs
     val getForecastValue: MutableLiveData<MutableList<ForecastDO?>?>
         get() = forecastMutableData
 
+    @SuppressLint("MissingPermission")
+    fun getCurrentLocation(locationManager: LocationManager,
+                           fusedLocationProviderClient: FusedLocationProviderClient,
+                           geocoder: Geocoder)
+    {
+        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            // TODO: 위치 비활성화 상태 처리
+        } else {
+            fusedLocationProviderClient.lastLocation
+                .addOnSuccessListener { location ->
+                    val currentLocation = LatLng(location.latitude, location.longitude)
+
+                    Log.d(TAG, "======== FUSED_LOCATION_CLIENT =======")
+                    Log.d(TAG, "LatLng: ${currentLocation}")
+                    Log.d(TAG, "bearing: ${location.bearing}")
+                    Log.d(TAG, "accuracy: ${location.accuracy}")
+                    Log.d(TAG, "speed: ${location.speed}")
+                    Log.d(TAG, "=============================")
+
+                    getCurrentWeatherLatLng(currentLocation.lat, currentLocation.lng, geocoder)
+                }
+        }
+    }
 
     /**
      * 좌표를 통해 날씨 정보를 받아옵니다.
      */
-    fun getCurrentWeatherLatLng(lat: Double, lng: Double) {
+    fun getCurrentWeatherLatLng(lat: Double, lng: Double, geocoder: Geocoder) {
         disposable = weatherUseCase.getCurrentWeatherLatLng(lat, lng).subscribe({
             val currentTemp = it.main.temp
             val currentTime = System.currentTimeMillis().toDate(CURRENT_TIME_PATTERN)
@@ -56,7 +88,13 @@ class WeatherViewModel @Inject constructor(private val weatherUseCase: WeatherUs
             val weatherIcon = Utility.setCodeToImg(weather.id)
             val weatherDescription = weather.description
 
-            currentMutableData.value = CurrentWeather(Utility.getRealTempAsString(currentTemp), currentTime, wearInfo, weatherIcon, weatherDescription)
+            val currentAddress = getCurrentAddress(lat, lng, geocoder)
+            currentMutableData.value = CurrentWeather(currentAddress,
+                Utility.getRealTempAsString(currentTemp),
+                currentTime,
+                wearInfo,
+                weatherIcon,
+                weatherDescription)
         }, {
             it.printStackTrace()
         })
@@ -140,5 +178,28 @@ class WeatherViewModel @Inject constructor(private val weatherUseCase: WeatherUs
         } else {
             false
         }
+    }
+    /**
+     * 위도 및 경도를 주소로 변환합니다.
+     * @param lat 위도
+     * @param lng 경도
+     * @return 변환된 주소값
+     */
+    fun getCurrentAddress(lat: Double, lng: Double, geocoder: Geocoder): String {
+        var addressList: List<Address> = mutableListOf()
+
+        try {
+            addressList = geocoder.getFromLocation(lat, lng, 10)
+        } catch (e: Exception) {
+            // TODO: 처리 필요
+            e.printStackTrace()
+        }
+
+        if (addressList.isNotEmpty()) {
+            val addr = addressList[0].getAddressLine(0)
+            val addrParts = addr.split(" ")
+            return "${addrParts[2]} ${addrParts[3]}"
+        }
+        return ""
     }
 }
