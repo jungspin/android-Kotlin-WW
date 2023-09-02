@@ -1,4 +1,4 @@
-package com.pinslog.ww.adapter
+package com.pinslog.ww.presentation.view.adapter
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager

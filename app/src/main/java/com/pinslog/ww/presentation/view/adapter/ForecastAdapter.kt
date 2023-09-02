@@ -1,10 +1,12 @@
-package com.pinslog.ww.adapter
+package com.pinslog.ww.presentation.view.adapter
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
 import com.pinslog.ww.R
@@ -14,7 +16,7 @@ import com.pinslog.ww.databinding.ItemForecastBinding
 import com.pinslog.ww.model.ForecastDO
 import com.pinslog.ww.util.Utility
 
-private const val TAG = "ForecastAdapter"
+
 class ForecastAdapter : BaseRecyclerAdapter<ItemForecastBinding, ForecastDO?>() {
 
     private lateinit var mContext: Context
@@ -40,36 +42,23 @@ class ForecastAdapter : BaseRecyclerAdapter<ItemForecastBinding, ForecastDO?>() 
     @SuppressLint("SetTextI18n")
     override fun bind(viewHolder: BaseViewHolder<ItemForecastBinding>, data: ForecastDO?) {
         viewHolder.vb?.run {
-            this.itemForecastDate.text = "${data?.dateString}"
-            this.itemForecastDay.text = "${data?.day}"
-            data?.resourceId.let {
-                if (it != null) {
-                    this.itemForecastIcon.setImageResource(it)
+            data?.let {
+                this.item = it
+                this.itemWearingInfoRoot.wearInfo = Utility.getWearingInfo(data.maxTemp.toDouble())
+                this.executePendingBindings()
+                this.itemWearingMaxBtn.setOnClickListener {
+                    this.itemWearingInfoRoot.wearInfo = Utility.getWearingInfo(data.maxTemp.toDouble())
+                }
+                this.itemWearingMinBtn.setOnClickListener {
+                    this.itemWearingInfoRoot.wearInfo = Utility.getWearingInfo(data.minTemp.toDouble())
                 }
             }
-            this.itemForecastMaxTemp.text = "${data?.maxTemp}°"
-            this.itemForecastMinTemp.text = "${data?.minTemp}°"
 
-            val pop = data?.pop
-            if (pop == 0.0) {
-                this.itemForecastPopRoot.visibility = View.GONE
-            } else {
-                this.itemForecastPop.text = "${data?.pop}"
-                this.itemForecastPopRoot.visibility = View.VISIBLE
-            }
-
-            getTemp(data?.maxTemp.toString(), this)
-            this.itemWearingMaxBtn.setOnClickListener {
-                getTemp(data?.maxTemp.toString(), this)
-            }
-            this.itemWearingMinBtn.setOnClickListener {
-                getTemp(data?.minTemp.toString(), this)
-            }
         }
     }
 
     private fun setInfoVisibility(binding: ItemForecastBinding) {
-        if (binding.itemWearingRoot.visibility != View.VISIBLE) {
+        if (!binding.itemWearingRoot.isVisible) {
             binding.itemInfoArrowIv.setImageResource(R.drawable.ic_arrow_up)
             TransitionManager.beginDelayedTransition(binding.materialCardView, AutoTransition())
             binding.itemWearingRoot.visibility = View.VISIBLE
@@ -83,23 +72,6 @@ class ForecastAdapter : BaseRecyclerAdapter<ItemForecastBinding, ForecastDO?>() 
     override fun setItems(dataList: MutableList<ForecastDO?>) {
         this.dataList.addAll(dataList)
         notifyItemRangeInserted(0, dataList.size - 1)
-    }
-
-    private fun getTemp(temp: String, binding: ItemForecastBinding) {
-        val wearInfo = Utility.getWearingInfo(temp.toDouble())
-        val infoList = wearInfo.wearingList
-        val wearingInfoBinding = binding.itemWearingInfoRoot
-        wearingInfoBinding.itemWearingDescription.text = wearInfo.infoDescription
-        wearingInfoBinding.itemWearing1.setImageResource(infoList[0])
-        wearingInfoBinding.itemWearing2.setImageResource(infoList[1])
-        wearingInfoBinding.itemWearing3.setImageResource(infoList[2])
-
-        wearingInfoBinding.itemWearingDescription.setOnClickListener {
-            wearingInfoBinding.itemWearing1.visibility = View.VISIBLE
-            wearingInfoBinding.itemWearing2.visibility = View.VISIBLE
-            wearingInfoBinding.itemWearing3.visibility = View.VISIBLE
-            wearingInfoBinding.itemWearingDescription.visibility = View.INVISIBLE
-        }
     }
 
 

@@ -1,222 +1,239 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:padding="8dp">
+    xmlns:bind="http://schemas.android.com/apk/res-auto">
 
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/materialCardView"
+    <data>
+        <variable
+            name="item"
+            type="com.pinslog.ww.model.ForecastDO" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:elevation="@dimen/cardview_default_elevation"
-        app:cardElevation="0dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHeight_percent="0.1"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:strokeColor="@drawable/stroke_color"
-        app:strokeWidth="1dp">
+        android:layout_height="wrap_content"
+        android:padding="8dp">
 
-        <!--    root of content    -->
-        <androidx.appcompat.widget.LinearLayoutCompat
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/materialCardView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:padding="8dp">
+            android:elevation="@dimen/cardview_default_elevation"
+            app:cardElevation="0dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHeight_percent="0.1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:strokeColor="@drawable/stroke_color"
+            app:strokeWidth="1dp">
 
-            <!--   default content    -->
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/item_forecast_root"
+            <!--    root of content    -->
+            <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="8dp">
 
-
-                <TextView
-                    android:id="@+id/item_forecast_date"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:gravity="end|center"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/item_forecast_day"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintHorizontal_weight="0.5"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:text="05.23"/>
-
-                <TextView
-                    android:id="@+id/item_forecast_day"
-                    style="@style/ForecastTextView"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:paddingStart="12dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/item_forecast_icon"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintHorizontal_weight="0.5"
-                    app:layout_constraintStart_toEndOf="@+id/item_forecast_date"
-                    app:layout_constraintTop_toTopOf="@+id/item_forecast_date"
-                    tools:text="화"/>
-
-                <ImageView
-                    android:id="@+id/item_forecast_icon"
-                    style="@style/ForecastTextView"
-                    android:layout_width="0dp"
-                    android:layout_height="50dp"
-                    android:contentDescription="날씨 아이콘"
-                    android:padding="8dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/item_forecast_max_temp"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintHorizontal_weight="0.5"
-                    app:layout_constraintStart_toEndOf="@+id/item_forecast_day"
-                    app:layout_constraintTop_toTopOf="@+id/item_forecast_day"
-                    tools:src="@drawable/ic_clear"/>
-
-                <TextView
-                    android:id="@+id/item_forecast_max_temp"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:gravity="end|center"
-                    app:layout_constraintBottom_toBottomOf="@+id/item_forecast_date"
-                    app:layout_constraintEnd_toStartOf="@+id/item_forecast_min_temp"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintHorizontal_weight="0.5"
-                    app:layout_constraintStart_toEndOf="@+id/item_forecast_icon"
-                    app:layout_constraintTop_toTopOf="@+id/item_forecast_date"
-                    tools:text="22"/>
-
-                <TextView
-                    android:id="@+id/item_forecast_min_temp"
-                    style="@style/ForecastTextView"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:paddingStart="8dp"
-                    android:gravity="center"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/item_info_arrow_iv"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintHorizontal_weight="0.5"
-                    app:layout_constraintStart_toEndOf="@+id/item_forecast_max_temp"
-                    app:layout_constraintTop_toTopOf="@+id/item_forecast_max_temp"
-                    tools:text="16"/>
-
-                <ImageView
-                    android:id="@+id/item_info_arrow_iv"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:src="@drawable/ic_arrow_down"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintHorizontal_weight="0.2"
-                    app:layout_constraintStart_toEndOf="@+id/item_forecast_min_temp"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/item_wearing_root"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone">
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/item_wearing_time"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:listitem="@layout/item_forecast_time" />
-
-                <include
-                    android:id="@+id/item_wearing_info_root"
-                    layout="@layout/item_wearing_info"
+                <!--   default content    -->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/item_forecast_root"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/item_wearing_time" />
+                    app:layout_constraintTop_toTopOf="parent">
 
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/item_forecast_pop_root"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="4dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/item_wearing_info_root">
 
                     <TextView
-                        android:id="@+id/item_forecast_pop_label"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="비올 확률"
+                        android:id="@+id/item_forecast_date"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:gravity="end|center"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent" />
+                        app:layout_constraintEnd_toStartOf="@+id/item_forecast_day"
+                        app:layout_constraintHorizontal_bias="0.5"
+                        app:layout_constraintHorizontal_weight="0.5"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:text="@{item.dateString}"
+                        tools:text="05.23" />
 
                     <TextView
-                        android:id="@+id/item_forecast_pop"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="4dp"
-                        android:text=""
-                        app:layout_constraintBottom_toBottomOf="@+id/item_forecast_pop_label"
-                        app:layout_constraintStart_toEndOf="@+id/item_forecast_pop_label"
-                        app:layout_constraintTop_toTopOf="@+id/item_forecast_pop_label" />
+                        android:id="@+id/item_forecast_day"
+                        style="@style/ForecastTextView"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:paddingStart="12dp"
+                        android:text="@{item.day}"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/item_forecast_icon"
+                        app:layout_constraintHorizontal_bias="0.5"
+                        app:layout_constraintHorizontal_weight="0.5"
+                        app:layout_constraintStart_toEndOf="@+id/item_forecast_date"
+                        app:layout_constraintTop_toTopOf="@+id/item_forecast_date"
+                        tools:text="화" />
+
+                    <ImageView
+                        android:id="@+id/item_forecast_icon"
+                        style="@style/ForecastTextView"
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
+                        android:contentDescription="날씨 아이콘"
+                        android:padding="8dp"
+                        imageRes="@{item.resourceId}"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/item_forecast_max_temp"
+                        app:layout_constraintHorizontal_bias="0.5"
+                        app:layout_constraintHorizontal_weight="0.5"
+                        app:layout_constraintStart_toEndOf="@+id/item_forecast_day"
+                        app:layout_constraintTop_toTopOf="@+id/item_forecast_day"
+                        tools:src="@drawable/ic_clear" />
 
                     <TextView
-                        android:id="@+id/item_forecast_pop_unit"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="4dp"
-                        android:text="%"
-                        app:layout_constraintBottom_toBottomOf="@+id/item_forecast_pop"
-                        app:layout_constraintStart_toEndOf="@+id/item_forecast_pop"
-                        app:layout_constraintTop_toTopOf="@+id/item_forecast_pop" />
+                        android:id="@+id/item_forecast_max_temp"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:gravity="end|center"
+                        android:text="@{item.maxTemp}"
+                        app:layout_constraintBottom_toBottomOf="@+id/item_forecast_date"
+                        app:layout_constraintEnd_toStartOf="@+id/item_forecast_min_temp"
+                        app:layout_constraintHorizontal_bias="0.5"
+                        app:layout_constraintHorizontal_weight="0.5"
+                        app:layout_constraintStart_toEndOf="@+id/item_forecast_icon"
+                        app:layout_constraintTop_toTopOf="@+id/item_forecast_date"
+                        tools:text="22" />
+
+                    <TextView
+                        android:id="@+id/item_forecast_min_temp"
+                        style="@style/ForecastTextView"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:gravity="center"
+                        android:paddingStart="8dp"
+                        android:text="@{item.minTemp}"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/item_info_arrow_iv"
+                        app:layout_constraintHorizontal_bias="0.5"
+                        app:layout_constraintHorizontal_weight="0.5"
+                        app:layout_constraintStart_toEndOf="@+id/item_forecast_max_temp"
+                        app:layout_constraintTop_toTopOf="@+id/item_forecast_max_temp"
+                        tools:text="16" />
+
+                    <ImageView
+                        android:id="@+id/item_info_arrow_iv"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:src="@drawable/ic_arrow_down"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0.5"
+                        app:layout_constraintHorizontal_weight="0.2"
+                        app:layout_constraintStart_toEndOf="@+id/item_forecast_min_temp"
+                        app:layout_constraintTop_toTopOf="parent" />
+
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
-                <com.google.android.material.button.MaterialButtonToggleGroup
-                    android:id="@+id/item_wearing_toggle_root"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:gravity="end"
-                    app:checkedButton="@id/item_wearing_max_btn"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/item_wearing_info_root"
-                    app:singleSelection="true">
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/item_wearing_root"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone">
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/item_wearing_max_btn"
-                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                        android:layout_width="70dp"
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/item_wearing_time"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="max"
-                        android:textAppearance="@style/TextAppearance.Material3.BodySmall"/>
+                        android:orientation="horizontal"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:listitem="@layout/item_forecast_time" />
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/item_wearing_min_btn"
-                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                        android:layout_width="70dp"
+                    <include
+                        android:id="@+id/item_wearing_info_root"
+                        layout="@layout/item_wearing_info"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="min"
-                        android:textAppearance="@style/TextAppearance.Material3.BodySmall"/>
-                </com.google.android.material.button.MaterialButtonToggleGroup>
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/item_wearing_time" />
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/item_forecast_pop_root"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="4dp"
+                        popViewVisible="@{item.pop}"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/item_wearing_info_root">
 
-        </androidx.appcompat.widget.LinearLayoutCompat>
+                        <TextView
+                            android:id="@+id/item_forecast_pop_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="비올 확률"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent" />
+
+                        <TextView
+                            android:id="@+id/item_forecast_pop"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="4dp"
+                            android:text="@{String.valueOf(item.pop)}"
+                            app:layout_constraintBottom_toBottomOf="@+id/item_forecast_pop_label"
+                            app:layout_constraintStart_toEndOf="@+id/item_forecast_pop_label"
+                            app:layout_constraintTop_toTopOf="@+id/item_forecast_pop_label" />
+
+                        <TextView
+                            android:id="@+id/item_forecast_pop_unit"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="4dp"
+                            android:text="%"
+                            app:layout_constraintBottom_toBottomOf="@+id/item_forecast_pop"
+                            app:layout_constraintStart_toEndOf="@+id/item_forecast_pop"
+                            app:layout_constraintTop_toTopOf="@+id/item_forecast_pop" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <com.google.android.material.button.MaterialButtonToggleGroup
+                        android:id="@+id/item_wearing_toggle_root"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:gravity="end"
+                        app:checkedButton="@id/item_wearing_max_btn"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/item_wearing_info_root"
+                        app:singleSelection="true">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/item_wearing_max_btn"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:layout_width="70dp"
+                            android:layout_height="wrap_content"
+                            android:text="max"
+                            android:textAppearance="@style/TextAppearance.Material3.BodySmall" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/item_wearing_min_btn"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:layout_width="70dp"
+                            android:layout_height="wrap_content"
+                            android:text="min"
+                            android:textAppearance="@style/TextAppearance.Material3.BodySmall" />
+                    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
 
 
-    </com.google.android.material.card.MaterialCardView>
+        </com.google.android.material.card.MaterialCardView>
 
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

@@ -4,7 +4,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import com.google.android.material.tabs.TabLayoutMediator
 import com.pinslog.ww.R
-import com.pinslog.ww.adapter.BookmarkViewPagerAdapter
+import com.pinslog.ww.presentation.view.adapter.BookmarkViewPagerAdapter
 import com.pinslog.ww.base.BaseActivity
 import com.pinslog.ww.databinding.ActivityBookmarkBinding
 

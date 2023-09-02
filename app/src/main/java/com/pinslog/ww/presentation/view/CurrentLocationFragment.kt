@@ -22,14 +22,13 @@ import com.google.firebase.dynamiclinks.DynamicLink.SocialMetaTagParameters
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
 import com.google.firebase.dynamiclinks.ktx.*
 import com.pinslog.ww.R
-import com.pinslog.ww.adapter.ForecastAdapter
+import com.pinslog.ww.presentation.view.adapter.ForecastAdapter
 import com.pinslog.ww.base.BaseFragment
 import com.pinslog.ww.databinding.FragmentCurrentLocationBinding
 import com.pinslog.ww.databinding.ItemWearingInfoBinding
 import com.pinslog.ww.util.*
 import com.pinslog.ww.presentation.viewmodel.WeatherViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import java.text.SimpleDateFormat
 import java.util.*
 
 /**
@@ -79,12 +78,6 @@ class CurrentLocationFragment : BaseFragment<FragmentCurrentLocationBinding>() {
         val locationManager = mContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         val geocoder = Geocoder(mContext)
         weatherViewModel.getCurrentLocation(locationManager, fusedLocationProviderClient, geocoder)
-
-        weatherViewModel.getForecastValue.observe(this) { data ->
-            if (data != null) {
-                forecastAdapter.setItems(data)
-            }
-        }
     }
 
     override fun doNextAfterGranted() {

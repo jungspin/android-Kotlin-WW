@@ -16,7 +16,7 @@ import androidx.viewbinding.ViewBinding
  */
 abstract class BaseRecyclerAdapter<VB : ViewBinding, T> : RecyclerView.Adapter<BaseViewHolder<VB>>() {
     private lateinit var binding: VB
-    protected val dataList = mutableListOf<T>()
+    var dataList = mutableListOf<T>()
 
     /**
      * inflate 된 ViewBinding 을 반환 합니다
