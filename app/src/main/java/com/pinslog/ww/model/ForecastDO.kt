@@ -1,5 +1,6 @@
 package com.pinslog.ww.model
 
+import com.pinslog.ww.presentation.model.HourlyForecast
 import com.pinslog.ww.util.Utility
 import java.util.*
 
@@ -9,8 +10,8 @@ class ForecastDO constructor(
     var id: Int,
     var maxTemp: String,
     var minTemp: String,
-    val pop: Double,
-    val hourlyMap: MutableMap<String, Int>
+    val pop: Int,
+    val hourlyMap: MutableMap<String, HourlyForecast>
 ) {
     private val calendar = Calendar.getInstance()
     val dateString : String
@@ -36,7 +37,7 @@ class ForecastDO constructor(
         }
 
     override fun toString(): String {
-        return "ForecastDO(month='$month', date='$date', resourceId=$resourceId, maxTemp='$maxTemp', minTemp='$minTemp', day='$day', hour='${hourlyMap.entries.joinToString()})"
+        return "ForecastDO(month='$month', date='$date', resourceId=$resourceId, pop=$pop, maxTemp='$maxTemp', minTemp='$minTemp', day='$day', hour='${hourlyMap.entries.joinToString()})"
     }
 
 

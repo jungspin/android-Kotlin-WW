@@ -139,15 +139,16 @@
                     android:id="@+id/item_wearing_root"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:visibility="gone">
+                    android:visibility="gone"
+                    tools:visibility="visible">
 
                     <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/item_wearing_time"
+                        android:id="@+id/item_wearing_time_rv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
+                        app:hourlyItems="@{item.hourlyMap}"
                         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                        app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         tools:listitem="@layout/item_forecast_time" />
@@ -157,9 +158,10 @@
                         layout="@layout/item_wearing_info"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/item_wearing_time" />
+                        app:layout_constraintTop_toBottomOf="@+id/item_wearing_time_rv" />
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/item_forecast_pop_root"

@@ -7,7 +7,9 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.pinslog.ww.model.ForecastDO
+import com.pinslog.ww.presentation.model.HourlyForecast
 import com.pinslog.ww.presentation.view.adapter.ForecastAdapter
+import com.pinslog.ww.presentation.view.adapter.HourlyForecastAdapter
 
 /**
  * WeatherViewModel 바인딩 어댑터
@@ -25,6 +27,16 @@ fun setForecastList(recyclerView: RecyclerView, items: List<ForecastDO?>?) {
     items?.let {
         val recyclerAdapter = recyclerView.adapter as ForecastAdapter
         recyclerAdapter.dataList = it.toMutableList()
+        recyclerAdapter.notifyDataSetChanged()
+    }
+}
+
+@SuppressLint("NotifyDataSetChanged")
+@BindingAdapter("app:hourlyItems")
+fun setHourlyForecastList(recyclerView: RecyclerView, items: Map<String, HourlyForecast>?){
+    items?.let { map ->
+        val recyclerAdapter = recyclerView.adapter as HourlyForecastAdapter
+        recyclerAdapter.dataList = map.map { it.value }.toMutableList()
         recyclerAdapter.notifyDataSetChanged()
     }
 }

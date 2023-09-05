@@ -6,16 +6,12 @@ import android.location.Geocoder
 import android.location.LocationManager
 import android.os.Build
 import android.util.Log
-import android.widget.ImageView
-import android.widget.Toast
-import androidx.annotation.RequiresApi
-import androidx.databinding.BindingAdapter
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
-import com.pinslog.ww.data.model.weatherLatLng.WeatherLatLng
 import com.pinslog.ww.model.ForecastDO
 import com.pinslog.ww.domain.usecase.WeatherUseCase
+import com.pinslog.ww.presentation.model.HourlyForecast
 import com.pinslog.ww.model.LatLng
 import com.pinslog.ww.presentation.model.CurrentWeather
 import com.pinslog.ww.util.CURRENT_TIME_PATTERN
@@ -107,11 +103,12 @@ class WeatherViewModel @Inject constructor(private val weatherUseCase: WeatherUs
         disposable = weatherUseCase.getForecastLatLng(lat, lng)
             .subscribe({ it ->
                 val weatherList = mutableListOf<ForecastDO?>()
-                val hourlyMap = mutableMapOf<String, Int>()
+                // 9 = (23, 123432)
+                val hourlyMap = mutableMapOf<String, HourlyForecast>()
                 it.list.filter {
                     isBeforeForecast(it.dt_txt)
                 }
-                var pop = 0.0
+
                 it.list.forEach {
                     val dt = it.dt_txt.split(" ")
                     val dateArray = dt[0].split("-")
@@ -119,12 +116,10 @@ class WeatherViewModel @Inject constructor(private val weatherUseCase: WeatherUs
                     val date = dateArray[2]
 
                     it.date = "$month-$date"
-                    pop = it.pop * 100
                 }
 
                 // 날짜별 묶음
                 val tmp = it.list.groupBy { it.date }
-
                 var id = 0
                 tmp.forEach { map ->
                     // month, date
@@ -132,18 +127,28 @@ class WeatherViewModel @Inject constructor(private val weatherUseCase: WeatherUs
                     val month = dateParts[0]
                     val date = dateParts[1]
 
+                    var pop = 0.0
                     map.value.forEach {
                         val dt = it.dt_txt.split(" ")
                         val timeArray = dt[1].split(":")
                         val time = timeArray[0]
-                        hourlyMap[time] = Utility.getRealTemp(it.main.temp)
+
                         // weather icon
-                        it.weather.forEach { id = it.id }
+                        it.weather.forEach { weather ->
+                            id = weather.id
+
+                            hourlyMap[time] = HourlyForecast(
+                                time = time.toInt(),
+                                resourceId = Utility.setCodeToImg(weather.id),
+                                temp = Utility.getRealTemp(it.main.temp)
+                            )
+                        }
+                        pop = it.pop * 100
                     }
                     val sortedMap = hourlyMap.toSortedMap()
 
                     // min, max temp
-                    val hourlyTemp: MutableCollection<Int> = sortedMap.values
+                    val hourlyTemp: List<Int> = sortedMap.values.map { it.temp }
 
                     val forecastDO = ForecastDO(
                         month = month,
@@ -151,9 +156,10 @@ class WeatherViewModel @Inject constructor(private val weatherUseCase: WeatherUs
                         id = id,
                         maxTemp = hourlyTemp.maxOf { it }.toString(),
                         minTemp = hourlyTemp.minOf { it }.toString(),
-                        pop = pop,
+                        pop = pop.toInt(),
                         hourlyMap = sortedMap,
                     )
+                    Log.d(TAG, "getForecastLatLng: $forecastDO")
                     weatherList.add(forecastDO)
                 }
                 forecastMutableData.value = weatherList
@@ -203,3 +209,4 @@ class WeatherViewModel @Inject constructor(private val weatherUseCase: WeatherUs
         return ""
     }
 }
+

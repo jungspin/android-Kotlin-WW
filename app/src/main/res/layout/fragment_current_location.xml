@@ -150,7 +150,8 @@
                             android:id="@+id/main_current_wearinfo_root"
                             layout="@layout/item_wearing_info"
                             bind:wearInfo="@{weatherViewModel.getValue.wearInfo}"
-                            android:visibility="gone" />
+                            android:visibility="gone"
+                            tools:visibility="visible"/>
                     </androidx.appcompat.widget.LinearLayoutCompat>
                 </com.google.android.material.card.MaterialCardView>
 

@@ -7,6 +7,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
 import com.pinslog.ww.R
@@ -17,6 +19,7 @@ import com.pinslog.ww.model.ForecastDO
 import com.pinslog.ww.util.Utility
 
 
+private const val TAG = "ForecastAdapterTest"
 class ForecastAdapter : BaseRecyclerAdapter<ItemForecastBinding, ForecastDO?>() {
 
     private lateinit var mContext: Context
@@ -42,15 +45,18 @@ class ForecastAdapter : BaseRecyclerAdapter<ItemForecastBinding, ForecastDO?>() 
     @SuppressLint("SetTextI18n")
     override fun bind(viewHolder: BaseViewHolder<ItemForecastBinding>, data: ForecastDO?) {
         viewHolder.vb?.run {
+            itemWearingTimeRv.layoutManager = LinearLayoutManager(mContext, RecyclerView.HORIZONTAL, false)
+            itemWearingTimeRv.adapter = HourlyForecastAdapter()
+
             data?.let {
-                this.item = it
-                this.itemWearingInfoRoot.wearInfo = Utility.getWearingInfo(data.maxTemp.toDouble())
-                this.executePendingBindings()
-                this.itemWearingMaxBtn.setOnClickListener {
-                    this.itemWearingInfoRoot.wearInfo = Utility.getWearingInfo(data.maxTemp.toDouble())
+                item = it
+                itemWearingInfoRoot.wearInfo = Utility.getWearingInfo(data.maxTemp.toDouble())
+                executePendingBindings()
+                itemWearingMaxBtn.setOnClickListener {
+                    itemWearingInfoRoot.wearInfo = Utility.getWearingInfo(data.maxTemp.toDouble())
                 }
-                this.itemWearingMinBtn.setOnClickListener {
-                    this.itemWearingInfoRoot.wearInfo = Utility.getWearingInfo(data.minTemp.toDouble())
+                itemWearingMinBtn.setOnClickListener {
+                    itemWearingInfoRoot.wearInfo = Utility.getWearingInfo(data.minTemp.toDouble())
                 }
             }
 
