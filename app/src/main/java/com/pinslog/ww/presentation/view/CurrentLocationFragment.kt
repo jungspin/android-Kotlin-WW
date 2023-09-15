@@ -1,12 +1,8 @@
 package com.pinslog.ww.presentation.view
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
-import android.location.Geocoder
-import android.location.LocationManager
 import android.net.Uri
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,22 +12,22 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
-import com.google.android.gms.location.LocationServices
 import com.google.firebase.dynamiclinks.DynamicLink.AndroidParameters
 import com.google.firebase.dynamiclinks.DynamicLink.SocialMetaTagParameters
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
 import com.google.firebase.dynamiclinks.ktx.*
 import com.pinslog.ww.R
-import com.pinslog.ww.presentation.view.adapter.ForecastAdapter
 import com.pinslog.ww.base.BaseFragment
 import com.pinslog.ww.databinding.FragmentCurrentLocationBinding
 import com.pinslog.ww.databinding.ItemWearingInfoBinding
-import com.pinslog.ww.util.*
+import com.pinslog.ww.presentation.view.adapter.ForecastAdapter
 import com.pinslog.ww.presentation.viewmodel.WeatherViewModel
+import com.pinslog.ww.util.*
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 
 /**
+ * WW 메인 화면 fragment
  * @since 2022-11-01
  */
 @AndroidEntryPoint
@@ -40,7 +36,6 @@ class CurrentLocationFragment : BaseFragment<FragmentCurrentLocationBinding>() {
     private val weatherViewModel: WeatherViewModel by viewModels()
     private lateinit var forecastAdapter: ForecastAdapter
     private lateinit var currentWearingInfo: ItemWearingInfoBinding
-    private lateinit var myLocation: MyLocation
 
     override fun getBinding(
         inflater: LayoutInflater,
@@ -63,8 +58,8 @@ class CurrentLocationFragment : BaseFragment<FragmentCurrentLocationBinding>() {
         binding.mainShareBtn.setOnClickListener(shareBtnClickListener)
         binding.mainLookInfoBtn.setOnClickListener(wearingInfoClickListener)
         binding.mainSwipeRefreshRoot.setOnRefreshListener {
-            forecastAdapter.clearItems()
             checkPermission()
+            forecastAdapter.clearItems()
             binding.mainSwipeRefreshRoot.isRefreshing = false
         }
     }
@@ -73,24 +68,10 @@ class CurrentLocationFragment : BaseFragment<FragmentCurrentLocationBinding>() {
     override fun initViewModel() {
         binding.weatherViewModel = weatherViewModel
         binding.lifecycleOwner = this
-
-        val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(mContext)
-        val locationManager = mContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        val geocoder = Geocoder(mContext)
-        weatherViewModel.getCurrentLocation(locationManager, fusedLocationProviderClient, geocoder)
     }
 
     override fun doNextAfterGranted() {
-        myLocation = MyLocation(mContext)
-        // 좌표
-        val latLng = myLocation.getCurrentLatLng()
-        val lat = latLng.lat
-        val lng = latLng.lng
-        // 위치 이름 설정
-//        val address = myLocation.latLngToAddress(latLng.lat, latLng.lng)
-//        binding.mainCurrentLocation.text = address
-
-        weatherViewModel.getForecastLatLng(lat, lng)
+        weatherViewModel.getCurrentLocation()
     }
 
     private val wearingInfoClickListener = View.OnClickListener {

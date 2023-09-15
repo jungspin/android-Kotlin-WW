@@ -1,6 +1,5 @@
 package com.pinslog.ww.di
 
-import com.pinslog.ww.domain.repository.WeatherRepository
 import com.pinslog.ww.domain.repository.impl.WeatherRepositoryImpl
 import com.pinslog.ww.domain.usecase.WeatherUseCase
 import dagger.Module

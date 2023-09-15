@@ -3,6 +3,7 @@ package com.pinslog.ww.util
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
 import android.content.Context
+import android.util.Log
 import android.view.View
 import androidx.core.animation.doOnEnd
 import com.pinslog.ww.R
@@ -66,7 +67,6 @@ object Utility {
     fun getWearingInfo(temp: Double): WearInfo {
         var wearDescription = ""
         var wearInfoList: ArrayList<Int> = arrayListOf()
-        val temp = temp.toDouble()
         if (temp >= 28.0) {
             //wearDescription = mContext.getString(R.string.description_28)
             wearDescription = "민소매, 반팔, 반바지, 원피스"

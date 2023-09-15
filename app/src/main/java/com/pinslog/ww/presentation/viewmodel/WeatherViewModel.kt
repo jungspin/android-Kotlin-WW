@@ -26,7 +26,12 @@ private const val TAG = "WeatherViewModel"
 
 
 @HiltViewModel
-class WeatherViewModel @Inject constructor(private val weatherUseCase: WeatherUseCase) : ViewModel() {
+class WeatherViewModel @Inject constructor(
+    private val weatherUseCase: WeatherUseCase,
+    private val fusedLocationProviderClient: FusedLocationProviderClient,
+    private val locationManager: LocationManager,
+    private val geocoder: Geocoder,
+) : ViewModel() {
 
     // MutableData
     private var currentMutableData = SingleLiveEvent<CurrentWeather?>()
@@ -47,10 +52,7 @@ class WeatherViewModel @Inject constructor(private val weatherUseCase: WeatherUs
         get() = forecastMutableData
 
     @SuppressLint("MissingPermission")
-    fun getCurrentLocation(locationManager: LocationManager,
-                           fusedLocationProviderClient: FusedLocationProviderClient,
-                           geocoder: Geocoder)
-    {
+    fun getCurrentLocation() {
         if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             // TODO: 위치 비활성화 상태 처리
         } else {
@@ -65,32 +67,36 @@ class WeatherViewModel @Inject constructor(private val weatherUseCase: WeatherUs
                     Log.d(TAG, "speed: ${location.speed}")
                     Log.d(TAG, "=============================")
 
-                    getCurrentWeatherLatLng(currentLocation.lat, currentLocation.lng, geocoder)
+                    getCurrentWeatherLatLng(currentLocation.lat, currentLocation.lng)
+                    getForecastLatLng(currentLocation.lat, currentLocation.lng)
                 }
+
         }
     }
 
     /**
      * 좌표를 통해 날씨 정보를 받아옵니다.
      */
-    fun getCurrentWeatherLatLng(lat: Double, lng: Double, geocoder: Geocoder) {
+    private fun getCurrentWeatherLatLng(lat: Double, lng: Double) {
         disposable = weatherUseCase.getCurrentWeatherLatLng(lat, lng).subscribe({
             val currentTemp = it.main.temp
             val currentTime = System.currentTimeMillis().toDate(CURRENT_TIME_PATTERN)
             // 옷 정보 설정
-            val wearInfo = Utility.getWearingInfo(currentTemp)
+            val wearInfo = Utility.getWearingInfo(Utility.getRealTemp(currentTemp).toDouble())
 
             val weather = it.weather[0]
             val weatherIcon = Utility.setCodeToImg(weather.id)
             val weatherDescription = weather.description
 
             val currentAddress = getCurrentAddress(lat, lng, geocoder)
-            currentMutableData.value = CurrentWeather(currentAddress,
+            currentMutableData.value = CurrentWeather(
+                currentAddress,
                 Utility.getRealTempAsString(currentTemp),
                 currentTime,
                 wearInfo,
                 weatherIcon,
-                weatherDescription)
+                weatherDescription
+            )
         }, {
             it.printStackTrace()
         })
@@ -99,7 +105,7 @@ class WeatherViewModel @Inject constructor(private val weatherUseCase: WeatherUs
     /**
      * 좌표를 통해 날씨 예보를 받아옵니다.
      */
-    fun getForecastLatLng(lat: Double, lng: Double) {
+    private fun getForecastLatLng(lat: Double, lng: Double) {
         disposable = weatherUseCase.getForecastLatLng(lat, lng)
             .subscribe({ it ->
                 val weatherList = mutableListOf<ForecastDO?>()
@@ -128,7 +134,10 @@ class WeatherViewModel @Inject constructor(private val weatherUseCase: WeatherUs
                     val date = dateParts[1]
 
                     var pop = 0.0
-                    map.value.forEach {
+                    val forecastTimeList =
+                        map.value.filter { !isBeforeForecast(it.dt_txt) }.toMutableList()
+                    if (forecastTimeList.isEmpty()) forecastTimeList.add(map.value.last())
+                    forecastTimeList.forEach {
                         val dt = it.dt_txt.split(" ")
                         val timeArray = dt[1].split(":")
                         val time = timeArray[0]
@@ -159,7 +168,6 @@ class WeatherViewModel @Inject constructor(private val weatherUseCase: WeatherUs
                         pop = pop.toInt(),
                         hourlyMap = sortedMap,
                     )
-                    Log.d(TAG, "getForecastLatLng: $forecastDO")
                     weatherList.add(forecastDO)
                 }
                 forecastMutableData.value = weatherList
@@ -185,13 +193,14 @@ class WeatherViewModel @Inject constructor(private val weatherUseCase: WeatherUs
             false
         }
     }
+
     /**
      * 위도 및 경도를 주소로 변환합니다.
      * @param lat 위도
      * @param lng 경도
      * @return 변환된 주소값
      */
-    fun getCurrentAddress(lat: Double, lng: Double, geocoder: Geocoder): String {
+    private fun getCurrentAddress(lat: Double, lng: Double, geocoder: Geocoder): String {
         var addressList: List<Address> = mutableListOf()
 
         try {
