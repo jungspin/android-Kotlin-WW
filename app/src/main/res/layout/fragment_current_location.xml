@@ -5,6 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:bind="http://schemas.android.com/apk/res-auto">
     <data>
+        <import type="com.pinslog.ww.presentation.model.Status"/>
+        <import type="android.view.View"/>
         <variable
             name="weatherViewModel"
             type="com.pinslog.ww.presentation.viewmodel.WeatherViewModel" />
@@ -54,7 +56,7 @@
                             style="@style/BaseTextView"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@{weatherViewModel.getValue.currentLocation}"
+                            android:text="@{weatherViewModel.getValue.data.currentLocation}"
                             android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
@@ -67,11 +69,24 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:textAppearance="?attr/textAppearanceBody2"
-                            android:text="@{weatherViewModel.getValue.currentTime}"
+                            android:text="@{weatherViewModel.getValue.data.currentTime}"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/main_current_location_tv"
                             tools:text="2023년 05월 05일 수요일 12시 34분"/>
+
+                        <com.airbnb.lottie.LottieAnimationView
+                            android:id="@+id/main_weather_loading"
+                            style="@style/BaseTextView"
+                            android:layout_width="match_parent"
+                            android:layout_height="150dp"
+                            android:padding="4dp"
+                            app:lottie_rawRes="@raw/lottie_loading_ww"
+                            app:lottie_autoPlay="true"
+                            app:lottie_loop="true"
+                            android:visibility="@{weatherViewModel.getValue.status == Status.LOADING ? View.VISIBLE : View.GONE}"
+                            tools:src="@drawable/ic_clear"
+                            tools:visibility="gone"/>
 
                         <ImageView
                             android:id="@+id/main_weather_img"
@@ -79,8 +94,10 @@
                             android:layout_width="match_parent"
                             android:layout_height="150dp"
                             android:padding="4dp"
-                            app:imageRes="@{weatherViewModel.getValue.weatherIcon}"
-                            tools:src="@drawable/ic_clear"/>
+                            android:visibility="@{weatherViewModel.getValue.status != Status.LOADING ? View.VISIBLE : View.GONE}"
+                            app:imageRes="@{weatherViewModel.getValue.data.weatherIcon}"
+                            tools:src="@drawable/ic_clear"
+                            tools:visibility="visible"/>
 
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:id="@+id/main_temp_root"
@@ -98,7 +115,7 @@
                                 app:layout_constraintHorizontal_chainStyle="packed"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent"
-                                android:text="@{weatherViewModel.getValue.currentTemp}"
+                                android:text="@{weatherViewModel.getValue.data.currentTemp}"
                                 tools:text="12"/>
 
                             <TextView
@@ -121,7 +138,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:textAppearance="?attr/textAppearanceBody2"
-                            android:text="@{weatherViewModel.getValue.weatherDescription}"
+                            android:text="@{weatherViewModel.getValue.data.weatherDescription}"
                             tools:text="@string/main_weather_description"/>
 
                         <androidx.appcompat.widget.LinearLayoutCompat
@@ -149,7 +166,7 @@
                         <include
                             android:id="@+id/main_current_wearinfo_root"
                             layout="@layout/item_wearing_info"
-                            bind:wearInfo="@{weatherViewModel.getValue.wearInfo}"
+                            bind:wearInfo="@{weatherViewModel.getValue.data.wearInfo}"
                             android:visibility="gone"
                             tools:visibility="visible"/>
                     </androidx.appcompat.widget.LinearLayoutCompat>

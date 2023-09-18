@@ -17,4 +17,5 @@
     <string name="main_weather_helper_text">"아이콘을 클릭하면 상세정보를 볼 수 있어요💁‍♀"</string>
 
     <string name="forecast_time">%s시</string>
+    <string name="temp">%s°</string>
 </resources>

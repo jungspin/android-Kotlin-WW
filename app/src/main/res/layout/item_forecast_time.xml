@@ -39,7 +39,7 @@
         android:id="@+id/item_temp"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@{String.valueOf(hourlyForecast.temp)}"
+        android:text="@{String.format(@string/temp, String.valueOf(hourlyForecast.temp))}"
         android:textAlignment="center"
         app:layout_constraintEnd_toEndOf="@+id/item_weather_icon"
         app:layout_constraintStart_toStartOf="@+id/item_weather_icon"

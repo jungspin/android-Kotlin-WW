@@ -5,15 +5,23 @@ import android.location.Address
 import android.location.Geocoder
 import android.location.LocationManager
 import android.os.Build
+import android.os.Looper
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.Priority
+import com.google.android.gms.maps.model.LatLng
+import com.pinslog.ww.R
 import com.pinslog.ww.model.ForecastDO
 import com.pinslog.ww.domain.usecase.WeatherUseCase
 import com.pinslog.ww.presentation.model.HourlyForecast
-import com.pinslog.ww.model.LatLng
 import com.pinslog.ww.presentation.model.CurrentWeather
+import com.pinslog.ww.presentation.model.Status
+import com.pinslog.ww.presentation.model.UiState
 import com.pinslog.ww.util.CURRENT_TIME_PATTERN
 import com.pinslog.ww.util.Utility
 import com.pinslog.ww.util.toDate
@@ -34,18 +42,24 @@ class WeatherViewModel @Inject constructor(
 ) : ViewModel() {
 
     // MutableData
-    private var currentMutableData = SingleLiveEvent<CurrentWeather?>()
+    private var currentMutableData = SingleLiveEvent<UiState<CurrentWeather>>()
     private var forecastMutableData = SingleLiveEvent<MutableList<ForecastDO?>?>()
 
     //private val weatherRepository = WeatherRepository()
     private lateinit var disposable: Disposable
 
     init {
-        currentMutableData.value = null
+        currentMutableData.value = UiState(
+            status = Status.LOADING,
+            data = CurrentWeather(
+                currentLocation = "위치를 불러오는 중입니다..",
+                weatherIcon = R.raw.lottie_loading_ww
+            )
+        )
         forecastMutableData.value = null
     }
 
-    val getValue: MutableLiveData<CurrentWeather?>
+    val getValue: MutableLiveData<UiState<CurrentWeather>>
         get() = currentMutableData
 
     val getForecastValue: MutableLiveData<MutableList<ForecastDO?>?>
@@ -58,20 +72,47 @@ class WeatherViewModel @Inject constructor(
         } else {
             fusedLocationProviderClient.lastLocation
                 .addOnSuccessListener { location ->
-                    val currentLocation = LatLng(location.latitude, location.longitude)
+                    if (location == null) {
+                        val locationCallback = object : LocationCallback(){
+                            override fun onLocationResult(result: LocationResult) {
+                                super.onLocationResult(result)
+                                result.locations.forEach { location ->
+                                    Log.d(TAG, "onLocationResult: $location")
+                                    loadWeatherData(location.latitude, location.longitude)
+                                }
+                            }
+                        }
+                        fusedLocationProviderClient.requestLocationUpdates(
+                            requestRequest, locationCallback, Looper.myLooper()
+                        )
+                    } else {
+                        Log.d(TAG, "======== FUSED_LOCATION_CLIENT lastLocation =======")
+                        Log.d(TAG, "LatLng: ${location.latitude}, ${location.longitude}")
+                        Log.d(TAG, "bearing: ${location.bearing}")
+                        Log.d(TAG, "accuracy: ${location.accuracy}")
+                        Log.d(TAG, "speed: ${location.speed}")
+                        Log.d(TAG, "=============================")
 
-                    Log.d(TAG, "======== FUSED_LOCATION_CLIENT =======")
-                    Log.d(TAG, "LatLng: ${currentLocation}")
-                    Log.d(TAG, "bearing: ${location.bearing}")
-                    Log.d(TAG, "accuracy: ${location.accuracy}")
-                    Log.d(TAG, "speed: ${location.speed}")
-                    Log.d(TAG, "=============================")
-
-                    getCurrentWeatherLatLng(currentLocation.lat, currentLocation.lng)
-                    getForecastLatLng(currentLocation.lat, currentLocation.lng)
+                        loadWeatherData(location.latitude, location.longitude)
+                    }
                 }
-
         }
+    }
+
+    /**
+     * 현재 좌표를 통해 날씨 정보를 불러옵니다.
+     *
+     * @param currentLocationLat latitude
+     * @param currentLocationLon longitude
+     */
+    private fun loadWeatherData(currentLocationLat: Double, currentLocationLon: Double) {
+        val currentLocation = LatLng(currentLocationLat, currentLocationLon)
+        getCurrentWeatherLatLng(currentLocation.latitude, currentLocation.longitude)
+        getForecastLatLng(currentLocation.latitude, currentLocation.longitude)
+    }
+    
+    private val requestRequest = LocationRequest.create().apply {
+        priority = Priority.PRIORITY_BALANCED_POWER_ACCURACY
     }
 
     /**
@@ -89,13 +130,16 @@ class WeatherViewModel @Inject constructor(
             val weatherDescription = weather.description
 
             val currentAddress = getCurrentAddress(lat, lng, geocoder)
-            currentMutableData.value = CurrentWeather(
-                currentAddress,
-                Utility.getRealTempAsString(currentTemp),
-                currentTime,
-                wearInfo,
-                weatherIcon,
-                weatherDescription
+            currentMutableData.value = UiState(
+                status = Status.SUCCESS,
+                data = CurrentWeather(
+                    currentAddress,
+                    Utility.getRealTempAsString(currentTemp),
+                    currentTime,
+                    wearInfo,
+                    weatherIcon,
+                    weatherDescription
+                ),
             )
         }, {
             it.printStackTrace()

@@ -3,19 +3,13 @@ package com.pinslog.ww
 import android.content.Context
 import android.location.Address
 import android.location.Geocoder
-import android.location.Location
-import android.os.Build
-import android.util.Log
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.runners.MockitoJUnitRunner
 import com.google.common.truth.Truth.assertThat
-import com.pinslog.ww.model.LatLng
-import org.junit.Before
 import java.text.SimpleDateFormat
-import java.time.LocalDateTime
 import java.util.*
 
 const val FAKE_STRING = "WW Application"

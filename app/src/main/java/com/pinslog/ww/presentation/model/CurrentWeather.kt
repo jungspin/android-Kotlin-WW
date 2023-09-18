@@ -8,10 +8,10 @@ import com.pinslog.ww.model.WearInfo
 * @since 2023/05/31 7:51 AM
 */
 data class CurrentWeather(
-    val currentLocation: String,
-    val currentTemp: String,
-    val currentTime: String,
-    val wearInfo: WearInfo,
-    val weatherIcon: Int,
-    val weatherDescription: String,
+    val currentLocation: String = "",
+    val currentTemp: String = "",
+    val currentTime: String = "",
+    val wearInfo: WearInfo = WearInfo(infoDescription = "", wearingList = arrayListOf()),
+    val weatherIcon: Int = -1,
+    val weatherDescription: String  = "",
 )

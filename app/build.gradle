@@ -143,6 +143,9 @@ dependencies {
 
     // coroutines
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
+
+    // lottie
+    implementation 'com.airbnb.android:lottie:3.0.7'
 }
 kapt {
     correctErrorTypes true
