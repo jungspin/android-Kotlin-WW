@@ -4,6 +4,8 @@ plugins {
     id 'androidx.navigation.safeargs'
     id 'com.google.dagger.hilt.android' version '2.44' apply true
     id 'com.google.gms.google-services'
+    // Add the Crashlytics Gradle plugin
+    id 'com.google.firebase.crashlytics'
 }
 apply plugin: 'kotlin-kapt'
 
@@ -140,6 +142,7 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom:31.2.3')
     implementation 'com.google.firebase:firebase-analytics-ktx'
     implementation 'com.google.firebase:firebase-dynamic-links-ktx'
+    implementation 'com.google.firebase:firebase-crashlytics-ktx'
 
     // coroutines
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
