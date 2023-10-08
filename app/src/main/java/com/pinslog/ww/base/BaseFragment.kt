@@ -17,15 +17,16 @@ import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
 
-const val REQUEST_CODE = 1000
-private const val TAG = "BaseFragment"
-
 abstract class BaseFragment<VB : ViewBinding> : Fragment() {
     protected var isAllowed : Boolean = false
 
     protected lateinit var binding: VB
     protected lateinit var mContext: Context
     protected lateinit var inflateView: ViewGroup
+
+    companion object {
+        const val REQUEST_CODE = 1000
+    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)

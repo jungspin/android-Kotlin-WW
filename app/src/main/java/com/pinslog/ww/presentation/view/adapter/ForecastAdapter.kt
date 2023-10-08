@@ -18,8 +18,6 @@ import com.pinslog.ww.databinding.ItemForecastBinding
 import com.pinslog.ww.model.ForecastDO
 import com.pinslog.ww.util.Utility
 
-
-private const val TAG = "ForecastAdapterTest"
 class ForecastAdapter : BaseRecyclerAdapter<ItemForecastBinding, ForecastDO?>() {
 
     private lateinit var mContext: Context

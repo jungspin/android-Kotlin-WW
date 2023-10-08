@@ -1,14 +1,11 @@
 package com.pinslog.ww.presentation.view
 
-import android.util.Log
 import android.view.LayoutInflater
 import com.google.android.material.tabs.TabLayoutMediator
-import com.pinslog.ww.R
-import com.pinslog.ww.presentation.view.adapter.BookmarkViewPagerAdapter
 import com.pinslog.ww.base.BaseActivity
 import com.pinslog.ww.databinding.ActivityBookmarkBinding
+import com.pinslog.ww.presentation.view.adapter.BookmarkViewPagerAdapter
 
-private const val TAG = "BookmarkActivity2"
 class BookmarkActivity : BaseActivity<ActivityBookmarkBinding>() {
     override fun getBinding(inflater: LayoutInflater): ActivityBookmarkBinding {
         binding = ActivityBookmarkBinding.inflate(inflater)

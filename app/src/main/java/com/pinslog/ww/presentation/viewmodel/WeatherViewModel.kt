@@ -15,6 +15,7 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.model.LatLng
+import com.pinslog.ww.BuildConfig
 import com.pinslog.ww.R
 import com.pinslog.ww.model.ForecastDO
 import com.pinslog.ww.domain.usecase.WeatherUseCase
@@ -77,7 +78,6 @@ class WeatherViewModel @Inject constructor(
                             override fun onLocationResult(result: LocationResult) {
                                 super.onLocationResult(result)
                                 result.locations.forEach { location ->
-                                    Log.d(TAG, "onLocationResult: $location")
                                     loadWeatherData(location.latitude, location.longitude)
                                 }
                             }
@@ -86,12 +86,14 @@ class WeatherViewModel @Inject constructor(
                             requestRequest, locationCallback, Looper.myLooper()
                         )
                     } else {
-                        Log.d(TAG, "======== FUSED_LOCATION_CLIENT lastLocation =======")
-                        Log.d(TAG, "LatLng: ${location.latitude}, ${location.longitude}")
-                        Log.d(TAG, "bearing: ${location.bearing}")
-                        Log.d(TAG, "accuracy: ${location.accuracy}")
-                        Log.d(TAG, "speed: ${location.speed}")
-                        Log.d(TAG, "=============================")
+                        if (BuildConfig.BUILD_TYPE == "debug") {
+                            Log.d(TAG, "======== FUSED_LOCATION_CLIENT lastLocation =======")
+                            Log.d(TAG, "LatLng: ${location.latitude}, ${location.longitude}")
+                            Log.d(TAG, "bearing: ${location.bearing}")
+                            Log.d(TAG, "accuracy: ${location.accuracy}")
+                            Log.d(TAG, "speed: ${location.speed}")
+                            Log.d(TAG, "=============================")
+                        }
 
                         loadWeatherData(location.latitude, location.longitude)
                     }
