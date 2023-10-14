@@ -12,19 +12,31 @@ apply plugin: 'kotlin-kapt'
 Properties properties = new Properties()
 properties.load(project.rootProject.file('local.properties').newDataInputStream())
 
+Properties keyProperties = new Properties()
+keyProperties.load(new FileInputStream(rootProject.file("keystore.properties")))
+
 android {
-    compileSdk 32
+    compileSdk 33
 
     defaultConfig {
         applicationId "com.pinslog.ww"
         minSdk 21
-        targetSdk 32
-        versionCode 1
-        versionName "1.0"
+        targetSdk 33
+        versionCode 2
+        versionName "1.0.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         composeOptions {
             kotlinCompilerExtensionVersion '1.1.1'
+        }
+    }
+
+    signingConfigs {
+        release {
+            storeFile file(keyProperties['SIGNED_STORE_FILE'])
+            storePassword keyProperties['SIGNED_STORE_PASSWORD']
+            keyAlias keyProperties['SIGNED_KEY_ALIAS']
+            keyPassword keyProperties['SIGNED_KEY_PASSWORD']
         }
     }
 
@@ -35,12 +47,16 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             buildConfigField "String", "BASE_URL", properties['api_url']
             buildConfigField "String", "APP_KEY", properties['api_key']
+            signingConfig signingConfigs.release
         }
         release {
-            minifyEnabled false
+            minifyEnabled false // 코드 축소, 난독화 및 최적화를 활성화
+            debuggable false
+            shrinkResources false // 리소스 축소 활성화
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             buildConfigField "String", "BASE_URL", properties['api_url']
             buildConfigField "String", "APP_KEY", properties['api_key']
+            signingConfig signingConfigs.release
         }
     }
     compileOptions {
@@ -143,6 +159,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics-ktx'
     implementation 'com.google.firebase:firebase-dynamic-links-ktx'
     implementation 'com.google.firebase:firebase-crashlytics-ktx'
+    implementation 'com.google.firebase:firebase-messaging:23.2.1'
 
     // coroutines
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'

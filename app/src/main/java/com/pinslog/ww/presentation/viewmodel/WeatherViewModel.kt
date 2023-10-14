@@ -250,7 +250,7 @@ class WeatherViewModel @Inject constructor(
         var addressList: List<Address> = mutableListOf()
 
         try {
-            addressList = geocoder.getFromLocation(lat, lng, 10)
+            addressList = geocoder.getFromLocation(lat, lng, 10)!!
         } catch (e: Exception) {
             // TODO: 처리 필요
             e.printStackTrace()
