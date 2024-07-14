@@ -163,4 +163,13 @@ Temporary Items
 # iCloud generated files
 *.icloud
 
+# Google Services (e.g. APIs or Firebase)
+google-services.json
+
+# Keystore files
+*.jks
+*.keystore
+
+*.aab
+
 # End of https://www.toptal.com/developers/gitignore/api/macos,intellij

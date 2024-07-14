@@ -9,6 +9,7 @@ import android.os.Looper
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -17,10 +18,10 @@ import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.model.LatLng
 import com.pinslog.ww.BuildConfig
 import com.pinslog.ww.R
-import com.pinslog.ww.model.ForecastDO
 import com.pinslog.ww.domain.usecase.WeatherUseCase
-import com.pinslog.ww.presentation.model.HourlyForecast
+import com.pinslog.ww.model.ForecastDO
 import com.pinslog.ww.presentation.model.CurrentWeather
+import com.pinslog.ww.presentation.model.HourlyForecast
 import com.pinslog.ww.presentation.model.Status
 import com.pinslog.ww.presentation.model.UiState
 import com.pinslog.ww.util.CURRENT_TIME_PATTERN
@@ -28,6 +29,10 @@ import com.pinslog.ww.util.Utility
 import com.pinslog.ww.util.toDate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.disposables.Disposable
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import javax.inject.Inject
 
@@ -49,15 +54,22 @@ class WeatherViewModel @Inject constructor(
     //private val weatherRepository = WeatherRepository()
     private lateinit var disposable: Disposable
 
+    // StateFlow
+    private var _currentWeatherStateFlow = MutableStateFlow<UiState<CurrentWeather>>(UiState())
+    val currentWeatherStateFlow = _currentWeatherStateFlow.asStateFlow()
+
+    private var _forecastWeatherStateFlow =
+        MutableStateFlow<UiState<MutableList<ForecastDO?>>>(UiState())
+    val forecastWeather = _forecastWeatherStateFlow.asStateFlow()
+
     init {
-        currentMutableData.value = UiState(
+        _currentWeatherStateFlow.value = UiState(
             status = Status.LOADING,
             data = CurrentWeather(
                 currentLocation = "위치를 불러오는 중입니다..",
                 weatherIcon = R.raw.lottie_loading_ww
             )
         )
-        forecastMutableData.value = null
     }
 
     val getValue: MutableLiveData<UiState<CurrentWeather>>
@@ -74,7 +86,7 @@ class WeatherViewModel @Inject constructor(
             fusedLocationProviderClient.lastLocation
                 .addOnSuccessListener { location ->
                     if (location == null) {
-                        val locationCallback = object : LocationCallback(){
+                        val locationCallback = object : LocationCallback() {
                             override fun onLocationResult(result: LocationResult) {
                                 super.onLocationResult(result)
                                 result.locations.forEach { location ->
@@ -112,7 +124,7 @@ class WeatherViewModel @Inject constructor(
         getCurrentWeatherLatLng(currentLocation.latitude, currentLocation.longitude)
         getForecastLatLng(currentLocation.latitude, currentLocation.longitude)
     }
-    
+
     private val requestRequest = LocationRequest.create().apply {
         priority = Priority.PRIORITY_BALANCED_POWER_ACCURACY
     }
@@ -220,6 +232,145 @@ class WeatherViewModel @Inject constructor(
             }) { it.printStackTrace() }
     }
 
+    // ===== flow =====
+    private fun getCurrentWeather(lat: Double, lon: Double) {
+        _currentWeatherStateFlow.value.apply {
+            viewModelScope.launch {
+                weatherUseCase.getCurrentWeather(lat, lon)
+                    // TODO: error 발생 시점 처리
+                    .stateIn(viewModelScope)
+                    .collect { response ->
+                        if (response.isSuccessful) {
+                            response.body()?.let { data ->
+                                val currentTemp = data.main.temp
+                                val currentTime =
+                                    System.currentTimeMillis().toDate(CURRENT_TIME_PATTERN)
+                                // 옷 정보 설정
+                                val wearInfo = Utility.getWearingInfo(
+                                    Utility.getRealTemp(currentTemp).toDouble()
+                                )
+
+                                val weather = data.weather[0]
+                                val weatherIcon = Utility.setCodeToImg(weather.id)
+                                val weatherDescription = weather.description
+
+                                val currentAddress = getCurrentAddress(lat, lon, geocoder)
+                                currentMutableData.value = UiState(
+                                    status = Status.SUCCESS,
+                                    data = CurrentWeather(
+                                        currentAddress,
+                                        Utility.getRealTempAsString(currentTemp),
+                                        currentTime,
+                                        wearInfo,
+                                        weatherIcon,
+                                        weatherDescription
+                                    ),
+                                )
+                            }
+                        } else {
+                            _currentWeatherStateFlow.value = UiState(
+                                status = Status.FAIL,
+                                message = "현재 날씨를 불러오는 데에 실패했습니다.",
+                            )
+                        }
+
+                    }
+            }
+        }
+
+    }
+
+    private fun getForecastWeather(lat: Double, lon: Double) {
+        _forecastWeatherStateFlow.value.apply {
+            viewModelScope.launch {
+                weatherUseCase.getForecastWeather(lat, lon)
+                    .stateIn(viewModelScope)
+                    .collect { response ->
+                        if (response.isSuccessful) {
+                            response.body()?.let { data ->
+                                val weatherList = mutableListOf<ForecastDO?>()
+                                // 9 = (23, 123432)
+                                val hourlyMap = mutableMapOf<String, HourlyForecast>()
+                                data.list.filter {
+                                    isBeforeForecast(it.dt_txt)
+                                }
+
+                                data.list.forEach {
+                                    val dt = it.dt_txt.split(" ")
+                                    val dateArray = dt[0].split("-")
+                                    val month = dateArray[1]
+                                    val date = dateArray[2]
+
+                                    it.date = "$month-$date"
+                                }
+
+                                // 날짜별 묶음
+                                val tmp = data.list.groupBy { it.date }
+                                var id = 0
+                                tmp.forEach { map ->
+                                    // month, date
+                                    val dateParts = map.key.split("-")
+                                    val month = dateParts[0]
+                                    val date = dateParts[1]
+
+                                    var pop = 0.0
+                                    val forecastTimeList =
+                                        map.value.filter { !isBeforeForecast(it.dt_txt) }
+                                            .toMutableList()
+                                    if (forecastTimeList.isEmpty()) forecastTimeList.add(map.value.last())
+                                    forecastTimeList.forEach {
+                                        val dt = it.dt_txt.split(" ")
+                                        val timeArray = dt[1].split(":")
+                                        val time = timeArray[0]
+
+                                        // weather icon
+                                        it.weather.forEach { weather ->
+                                            id = weather.id
+
+                                            hourlyMap[time] = HourlyForecast(
+                                                time = time.toInt(),
+                                                resourceId = Utility.setCodeToImg(weather.id),
+                                                temp = Utility.getRealTemp(it.main.temp)
+                                            )
+                                        }
+                                        pop = it.pop * 100
+                                    }
+                                    val sortedMap = hourlyMap.toSortedMap()
+
+                                    // min, max temp
+                                    val hourlyTemp: List<Int> =
+                                        sortedMap.values.map { it.temp }
+
+                                    val forecastDO = ForecastDO(
+                                        month = month,
+                                        date = date,
+                                        id = id,
+                                        maxTemp = hourlyTemp.maxOf { it }.toString(),
+                                        minTemp = hourlyTemp.minOf { it }.toString(),
+                                        pop = pop.toInt(),
+                                        hourlyMap = sortedMap,
+                                    )
+                                    weatherList.add(forecastDO)
+                                }
+                                _forecastWeatherStateFlow.value = UiState(
+                                    status = Status.SUCCESS,
+                                    data = weatherList
+                                )
+                            }
+                        } else {
+                            _forecastWeatherStateFlow.value = UiState(
+                                status = Status.FAIL,
+                                message = "날씨 예보를 불러오는 데에 실패했습니다.",
+                            )
+                        }
+                    }
+            }
+        }
+    }
+
+    /**
+     * 이전 예보 판단
+     */
     private fun isBeforeForecast(dateText: String): Boolean {
         val dateTextParts = dateText.split(" ")
         val datePart = dateTextParts[0].split("-")
