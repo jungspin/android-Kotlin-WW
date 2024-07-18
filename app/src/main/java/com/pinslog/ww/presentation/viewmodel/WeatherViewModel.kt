@@ -255,7 +255,7 @@ class WeatherViewModel @Inject constructor(
                                 val weatherDescription = weather.description
 
                                 val currentAddress = getCurrentAddress(lat, lon, geocoder)
-                                currentMutableData.value = UiState(
+                                _currentWeatherStateFlow.value = UiState(
                                     status = Status.SUCCESS,
                                     data = CurrentWeather(
                                         currentAddress,
