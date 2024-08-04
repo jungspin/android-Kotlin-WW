@@ -25,6 +25,11 @@
         android:usesCleartextTraffic="true"
         tools:ignore="HardcodedDebugMode">
         <activity
+            android:name=".presentation.view.screens.MainActivity"
+            android:exported="false"
+            android:label="@string/title_activity_main"
+            android:theme="@style/Theme.WearToGo" />
+        <activity
             android:name=".presentation.view.SplashActivity"
             android:exported="true"
             android:theme="@style/SplashTheme">

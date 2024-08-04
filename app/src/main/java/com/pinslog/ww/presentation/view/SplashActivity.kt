@@ -5,6 +5,7 @@ import android.content.Intent
 import android.view.LayoutInflater
 import com.pinslog.ww.base.BaseActivity
 import com.pinslog.ww.databinding.ActivitySplashBinding
+import com.pinslog.ww.presentation.view.screens.MainActivity
 
 @SuppressLint("CustomSplashScreen")
 class SplashActivity : BaseActivity<ActivitySplashBinding>() {

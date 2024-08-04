@@ -1,6 +1,7 @@
 package com.pinslog.ww.presentation.viewmodel.adapter
 
 import android.annotation.SuppressLint
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
