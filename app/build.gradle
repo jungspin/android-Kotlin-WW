@@ -16,13 +16,14 @@ Properties keyProperties = new Properties()
 keyProperties.load(new FileInputStream(rootProject.file("keystore.properties")))
 
 android {
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.pinslog.ww"
         minSdk 21
-        targetSdk 33
-        versionCode 2
+        //noinspection EditedTargetSdkVersion
+        targetSdk 34
+        versionCode 4
         versionName "1.0.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -96,7 +97,7 @@ dependencies {
 
     // compose
     // Integration with activities
-    implementation 'androidx.activity:activity-compose:1.5.1'
+    implementation 'androidx.activity:activity-compose:1.6.0'
     // Compose Material Design
     implementation 'androidx.compose.material:material:1.2.0'
     // Animations
@@ -109,19 +110,19 @@ dependencies {
     androidTestImplementation 'androidx.compose.ui:ui-test-junit4:1.2.0'
 
     // Jetpack Navigation
-    def nav_version = "2.5.0"
-    // Jetpack Compose Integration
-    //noinspection GradleDependency
-    implementation "androidx.navigation:navigation-compose:$nav_version"
-    // Navigation UI
-    //noinspection GradleDependency
-    implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
-    // Feature module Support
-    //noinspection GradleDependency
-    implementation "androidx.navigation:navigation-dynamic-features-fragment:$nav_version"
-    // Testing Navigation
-    //noinspection GradleDependency
-    androidTestImplementation "androidx.navigation:navigation-testing:$nav_version"
+//    def nav_version = "2.5.0"
+//    // Jetpack Compose Integration
+//    //noinspection GradleDependency
+//    implementation "androidx.navigation:navigation-compose:$nav_version"
+//    // Navigation UI
+//    //noinspection GradleDependency
+//    implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
+//    // Feature module Support
+//    //noinspection GradleDependency
+//    implementation "androidx.navigation:navigation-dynamic-features-fragment:$nav_version"
+//    // Testing Navigation
+//    //noinspection GradleDependency
+//    androidTestImplementation "androidx.navigation:navigation-testing:$nav_version"
 
     // retrofit2
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
@@ -144,7 +145,7 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
 
     //Place API
-    implementation 'com.google.android.gms:play-services-places:17.0.0'
+    implementation 'com.google.android.gms:play-services-places:17.1.0'
     implementation 'com.google.android.gms:play-services-location:21.0.1'
 
     // LeakCanary
