@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import com.pinslog.ww.R
 import com.pinslog.ww.model.ForecastDO
 import com.pinslog.ww.presentation.model.HourlyForecast
+import com.pinslog.ww.presentation.view.components.MinMaxToggleGroup
 import com.pinslog.ww.presentation.view.components.MultiToggleButton
 import com.pinslog.ww.presentation.view.screens.ui.theme.WWTheme
 import com.pinslog.ww.util.Utility
@@ -245,12 +246,9 @@ fun CurrentWeatherLayout(name: String, modifier: Modifier = Modifier) {
                             text = wearInfo.infoDescription
                         )
                         // 최대/최소 기온 버튼
-                        MultiToggleButton(currentSelection = "max", toggleStates = listOf("max", "min")) {
-                            Log.d("toggleTest", "CurrentWeatherLayout: $it")
+                        MinMaxToggleGroup(items = listOf("max", "min")) {
+
                         }
-//                        OutlinedIconToggleButton(checked = true, onCheckedChange = ) {
-//
-//                        }
                     }
                 }
             }
