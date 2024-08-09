@@ -23,7 +23,7 @@ fun imageLoad(imageView: ImageView, resId: Int) {
 }
 
 @SuppressLint("NotifyDataSetChanged")
-@BindingAdapter("app:items")
+@BindingAdapter("items")
 fun setForecastList(recyclerView: RecyclerView, items: List<ForecastDO?>?) {
     items?.let {
         val recyclerAdapter = recyclerView.adapter as ForecastAdapter
@@ -33,7 +33,7 @@ fun setForecastList(recyclerView: RecyclerView, items: List<ForecastDO?>?) {
 }
 
 @SuppressLint("NotifyDataSetChanged")
-@BindingAdapter("app:hourlyItems")
+@BindingAdapter("hourlyItems")
 fun setHourlyForecastList(recyclerView: RecyclerView, items: Map<String, HourlyForecast>?){
     items?.let { map ->
         val recyclerAdapter = recyclerView.adapter as HourlyForecastAdapter
