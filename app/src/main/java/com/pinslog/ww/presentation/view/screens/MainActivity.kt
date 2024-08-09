@@ -5,10 +5,12 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -42,7 +44,6 @@ import com.pinslog.ww.R
 import com.pinslog.ww.model.ForecastDO
 import com.pinslog.ww.presentation.model.HourlyForecast
 import com.pinslog.ww.presentation.view.components.MinMaxToggleGroup
-import com.pinslog.ww.presentation.view.components.MultiToggleButton
 import com.pinslog.ww.presentation.view.screens.ui.theme.WWTheme
 import com.pinslog.ww.util.Utility
 
@@ -246,9 +247,21 @@ fun CurrentWeatherLayout(name: String, modifier: Modifier = Modifier) {
                             text = wearInfo.infoDescription
                         )
                         // 최대/최소 기온 버튼
-                        MinMaxToggleGroup(items = listOf("max", "min")) {
+                        Row(modifier = Modifier.fillMaxWidth().padding(0.dp)) {
+                            Spacer(modifier = Modifier.weight(0.5f).background(Color.Magenta))
+                            MinMaxToggleGroup(
+                                items = listOf("max", "min"),
+                                modifier = Modifier.weight(0.5f)
+                            ) { selectedButtonText ->
+                                // max/min 컴포넌트를 하나씩 만들어두고, 버튼 클릭에 따라 어떤걸 보여줄지 결정
+                                if (selectedButtonText == "max") {
 
+                                } else {
+//                                    Utility.getWearingInfo(item.minTemp.toDouble())
+                                }
+                            }
                         }
+
                     }
                 }
             }
