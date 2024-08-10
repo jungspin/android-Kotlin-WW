@@ -24,8 +24,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.pinslog.ww.presentation.view.screens.ui.theme.Blue1
 
-
+/**
+ * 최고/최저 기온 옷차림 확인을 위한 토글 버튼
+ *
+ * @param items 버튼 텍스트 리스트
+ * @param modifier
+ * @param onItemSelected 버튼이 클릭 되었을 때의 행위
+ */
 @Composable
 fun MinMaxToggleGroup(
     items: List<String>,
@@ -45,7 +52,7 @@ fun MinMaxToggleGroup(
         items.forEachIndexed { index, item ->
             val isSelected = item == selectedItem
             val backgroundColor =
-                if (isSelected) MaterialTheme.colors.primary else Color.Transparent
+                if (isSelected) Blue1 else Color.Transparent
             val contentColor = if (isSelected) Color.White else MaterialTheme.colors.onSurface
 
             val toggleRoundCornerShape: RoundedCornerShape

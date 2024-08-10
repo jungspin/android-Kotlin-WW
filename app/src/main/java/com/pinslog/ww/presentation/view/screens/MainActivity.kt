@@ -1,12 +1,13 @@
 package com.pinslog.ww.presentation.view.screens
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,120 +21,125 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.google.firebase.dynamiclinks.DynamicLink
+import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
 import com.pinslog.ww.R
 import com.pinslog.ww.model.ForecastDO
+import com.pinslog.ww.presentation.model.CurrentWeather
 import com.pinslog.ww.presentation.model.HourlyForecast
 import com.pinslog.ww.presentation.view.components.MinMaxToggleGroup
+import com.pinslog.ww.presentation.view.components.WearInfoItem
+import com.pinslog.ww.presentation.view.components.WwTextHeadLine
+import com.pinslog.ww.presentation.view.components.WwTextLarge
+import com.pinslog.ww.presentation.view.components.WwTextMedium
+import com.pinslog.ww.presentation.view.screens.ui.theme.Blue1
 import com.pinslog.ww.presentation.view.screens.ui.theme.WWTheme
 import com.pinslog.ww.util.Utility
+import com.pinslog.ww.util.noRippleClickable
+
+private const val TAG = "ComposeTest"
 
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val isExpandForecast by remember {
-                mutableStateOf(false)
-            }
-
-            WWTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+            CurrentSurface {
+                LazyColumn(
+                    modifier = Modifier.padding(18.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    CurrentWeatherLayout("Android")
+                    item {
+                        CurrentWeatherCard(currentWeather = sampleCurrentWeather) {
+                            createDynamicLink(sampleCurrentWeather)
+                        }
+                    }
+                    items(sampleForecastList) {
+                        var isExpand by remember {
+                            mutableStateOf(false)
+                        }
+                        ForecastItem(item = it, isExpand = isExpand) {
+                            isExpand = !isExpand
+                        }
+                    }
                 }
             }
         }
     }
-}
 
-@Composable
-fun CurrentWeatherLayout(name: String, modifier: Modifier = Modifier) {
-
-    LazyColumn(modifier = Modifier.padding(18.dp)) {
-        item {
-            OutlinedCard(modifier = Modifier.clickable { }) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight(0.5f)
-                        .padding(8.dp),
-                    verticalArrangement = Arrangement.SpaceAround,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-
-                    Text(
-                        text = "부산광역시 해운대구 재반로",
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = "2024년 7월 18일 목 23:39",
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                    Image(
-                        painterResource(id = R.drawable.ic_clear),
-                        contentDescription = "날씨 이미지"
-                    )
-                    Text(text = "23°", style = MaterialTheme.typography.bodyMedium)
-                    Text(text = "맑음", style = MaterialTheme.typography.bodyMedium)
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        Button(
-                            onClick = {},
-                            colors = ButtonColors(
-                                containerColor = Color.Transparent,
-                                contentColor = Color.Blue,
-                                disabledContainerColor = Color.Transparent,
-                                disabledContentColor = Color.Transparent
-                            )
-                        ) {
-                            Text(text = "오늘 뭐입지?", style = MaterialTheme.typography.bodyMedium)
-                        }
-                        Button(
-                            onClick = {},
-                            colors = ButtonColors(
-                                containerColor = Color.Transparent,
-                                contentColor = Color.Blue,
-                                disabledContainerColor = Color.Transparent,
-                                disabledContentColor = Color.Transparent
-                            )
-                        ) {
-                            Text(text = "공유하기", style = MaterialTheme.typography.bodyMedium)
-                        }
-
-                    }
-                }
+    /**
+     * 동적 링크를 생성합니다.
+     */
+    private fun createDynamicLink(currentWeather: CurrentWeather) {
+        FirebaseDynamicLinks.getInstance().createDynamicLink()
+            .setLink(Uri.parse("https://www.pinslog.com/"))
+            .setDomainUriPrefix("https://pinslog.page.link")
+            .setAndroidParameters(DynamicLink.AndroidParameters.Builder().build())
+            .setSocialMetaTagParameters(
+                DynamicLink.SocialMetaTagParameters.Builder()
+                    .setTitle("Wear Weather")
+                    .setDescription("기온별 옷차림 안내 어플")
+                    .build()
+            )
+            .buildShortDynamicLink()
+            .addOnSuccessListener {
+                val shortLink = it.shortLink!!
+                createShareSheet(currentWeather, shortLink)
             }
-            // end currentWeather
+            .addOnFailureListener {
+                Toast.makeText(this, "일시적 문제로 데이터를 공유할 수 없습니다.", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    /**
+     * 공유할 내용을 생성합니다.
+     *
+     * @param dynamicLink 동적 링크
+     */
+    private fun createShareSheet(currentWeather: CurrentWeather, dynamicLink: Uri) {
+        val content = """
+            ${currentWeather.currentLocation}의 현재 기온은 ${currentWeather.currentTemp}°.
+            ${currentWeather.wearInfo.infoDescription}를 추천드려요.
+            자세한 정보가 궁금하다면? $dynamicLink
+        """.trimIndent()
+
+        val sendIntent: Intent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, content)
+            type = "text/plain"
         }
-        // start list
-        val sampleList = mutableListOf<ForecastDO>(
+        val shareIntent = Intent.createChooser(sendIntent, null)
+        startActivity(shareIntent)
+    }
+
+    companion object {
+        val sampleCurrentWeather = CurrentWeather(
+            currentLocation = "부산광역시 해운대구 센텀중앙로",
+            currentTime = "2024년 7월 19일 목 23시 45분",
+            currentTemp = "23",
+            weatherDescription = "맑음",
+            weatherIcon = R.drawable.ic_clear,
+            wearInfo = Utility.getWearingInfo("23".toDouble())
+        )
+        val sampleForecastList = mutableListOf<ForecastDO>(
             ForecastDO(
                 month = "07",
                 date = "23",
@@ -172,109 +178,202 @@ fun CurrentWeatherLayout(name: String, modifier: Modifier = Modifier) {
                 )
             )
         )
+    }
+}
 
+@Composable
+fun CurrentSurface(content: @Composable () -> Unit) {
+    WWTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = Color.White
+        ) {
+            content()
+        }
+    }
+}
 
-        items(sampleList) { item ->
-            OutlinedCard {
-                Column(
-                    modifier = Modifier
-                        .padding(16.dp)
-                ) {
+@Composable
+fun CurrentWeatherCard(currentWeather: CurrentWeather, onShareButtonClick: () -> Unit) {
+    var isExpand by remember {
+        mutableStateOf(false)
+    }
+    OutlinedCard {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.5f)
+                .padding(8.dp),
+            verticalArrangement = Arrangement.SpaceAround,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            WwTextHeadLine(text = currentWeather.currentLocation)
+            WwTextLarge(text = currentWeather.currentTime)
+            Image(
+                painterResource(id = R.drawable.ic_clear),
+                contentDescription = "날씨 이미지"
+            )
+            WwTextMedium(text = currentWeather.currentTemp)
+            WwTextMedium(text = currentWeather.weatherDescription)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                CurrentWeatherButton(text = "오늘 뭐입지?", modifier = Modifier) {
+                    isExpand = !isExpand
+                }
+                CurrentWeatherButton(text = "공유하기", modifier = Modifier) {
+                    onShareButtonClick()
+                }
+            }
+            if (isExpand) {
+                WearInfoItem(wearInfo = currentWeather.wearInfo, modifier = Modifier)
+            }
+        }
+    }
+}
+
+/**
+ * 날씨 예보 아이템
+ *
+ * @param item ForecastDo
+ * @param isExpand 예보 펼침 여부
+ * @param onClickForecastRow 예보 아이템 클릭 시 행위
+ */
+@Composable
+fun ForecastItem(item: ForecastDO, isExpand: Boolean, onClickForecastRow: () -> Unit) {
+    OutlinedCard {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .noRippleClickable {
+                        onClickForecastRow()
+                    },
+                horizontalArrangement = Arrangement.SpaceAround,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                WwTextMedium(text = "${item.month}.${item.date}")
+                WwTextMedium(text = item.day)
+                Image(
+                    painterResource(id = R.drawable.ic_clear),
+                    contentDescription = "날씨 이미지",
+                    modifier = Modifier.size(30.dp),
+                )
+                WwTextMedium(text = "${item.minTemp}°")
+                WwTextMedium(text = "${item.maxTemp}°")
+                Icon(
+                    imageVector = if (isExpand) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
+                    contentDescription = "날씨 정보 더보기 아이콘"
+                )
+            }
+            if (isExpand) { // TODO: 애니메이션 추가하자
+                // Expand
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    LazyRow {
+                        // 시간별 예보
+                        items(items = item.hourlyMap.values.toList()) { item: HourlyForecast ->
+                            Column(
+                                Modifier.padding(
+                                    vertical = 12.dp,
+                                    horizontal = 12.dp
+                                ),
+                                verticalArrangement = Arrangement.spacedBy(8.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                WwTextMedium(text = "${item.time}시")
+                                Image(
+                                    painterResource(id = item.resourceId),
+                                    contentDescription = "시간별 날씨 이미지",
+                                    modifier = Modifier.size(35.dp),
+                                )
+                                WwTextMedium(text = "${item.temp}°")
+                            }
+                        }
+                    }
+                    var isMaxTemp by remember {
+                        mutableStateOf(true)
+                    }
+                    val wearInfo = if (isMaxTemp) {
+                        Utility.getWearingInfo(item.maxTemp.toDouble())
+                    } else {
+                        Utility.getWearingInfo(item.minTemp.toDouble())
+                    }
+                    WearInfoItem(wearInfo = wearInfo, modifier = Modifier)
+
+                    // 최대/최소 기온 버튼
                     Row(
                         modifier = Modifier
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceAround
+                            .fillMaxWidth()
+                            .padding(0.dp)
                     ) {
-                        Text(text = "${item.month}.${item.date}")
-                        Text(text = item.day)
-                        Image(
-                            painterResource(id = R.drawable.ic_clear),
-                            contentDescription = "날씨 이미지",
-                            modifier = Modifier.size(30.dp),
-                        )
-                        Text(text = "${item.minTemp}°")
-                        Text(text = "${item.maxTemp}°")
-                        Icon(
-                            imageVector = Icons.Filled.ArrowDropDown,
-                            contentDescription = "날씨 정보 더보기 아이콘"
-                        )
-                    }
-                    // Expand
-                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        LazyRow {
-                            // 시간별 예보
-                            items(items = item.hourlyMap.values.toList()) { item: HourlyForecast ->
-                                Column(
-                                    Modifier.padding(
-                                        vertical = 12.dp,
-                                        horizontal = 12.dp
-                                    ),
-                                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    Text(text = "${item.time}시")
-                                    Image(
-                                        painterResource(id = item.resourceId),
-                                        contentDescription = "시간별 날씨 이미지",
-                                        modifier = Modifier.size(35.dp),
-                                    )
-                                    Text(text = "${item.temp}°")
-                                }
-                            }
-                        }
-                        val wearInfo =
-                            Utility.getWearingInfo(item.maxTemp.toDouble())
-                        // 의복 이미지
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceEvenly
-                        ) {
-                            for (resourceId in wearInfo.wearingList) {
-                                Image(
-                                    painterResource(id = resourceId),
-                                    contentDescription = "온도별 의상 이미지",
-                                    modifier = Modifier
-                                        .size(80.dp),
-                                )
-                            }
-                        }
-                        // 옷차림 설명
-                        Text(
+                        Spacer(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 4.dp),
-                            textAlign = TextAlign.Center,
-                            text = wearInfo.infoDescription
+                                .weight(0.5f)
+                                .background(Color.Magenta)
                         )
-                        // 최대/최소 기온 버튼
-                        Row(modifier = Modifier.fillMaxWidth().padding(0.dp)) {
-                            Spacer(modifier = Modifier.weight(0.5f).background(Color.Magenta))
-                            MinMaxToggleGroup(
-                                items = listOf("max", "min"),
-                                modifier = Modifier.weight(0.5f)
-                            ) { selectedButtonText ->
-                                // max/min 컴포넌트를 하나씩 만들어두고, 버튼 클릭에 따라 어떤걸 보여줄지 결정
-                                if (selectedButtonText == "max") {
-
-                                } else {
-//                                    Utility.getWearingInfo(item.minTemp.toDouble())
-                                }
-                            }
+                        MinMaxToggleGroup(
+                            items = listOf("max", "min"),
+                            modifier = Modifier.weight(0.5f)
+                        ) { selectedButtonText ->
+                            // max/min 컴포넌트를 하나씩 만들어두고, 버튼 클릭에 따라 어떤걸 보여줄지 결정
+                            isMaxTemp = selectedButtonText == "max"
                         }
-
                     }
+
                 }
             }
         }
-
     }
+}
 
+@Composable
+fun CurrentWeatherButton(
+    text: String,
+    modifier: Modifier,
+    onClick: () -> Unit,
+) {
+    Button(
+        onClick = {
+            onClick()
+        },
+        colors = ButtonColors(
+            containerColor = Color.Transparent,
+            contentColor = Color.Blue,
+            disabledContainerColor = Color.Transparent,
+            disabledContentColor = Color.Transparent
+        ),
+        modifier = modifier,
+    ) {
+        WwTextMedium(text = text, textColor = Blue1)
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
-    WWTheme {
-        CurrentWeatherLayout("Android")
+    CurrentSurface {
+        LazyColumn(
+            modifier = Modifier.padding(18.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            item {
+                CurrentWeatherCard(currentWeather = MainActivity.sampleCurrentWeather) {
+
+                }
+            }
+            items(MainActivity.sampleForecastList) {
+                var isExpand by remember {
+                    mutableStateOf(false)
+                }
+                ForecastItem(item = it, isExpand = isExpand) {
+                    isExpand = !isExpand
+                }
+            }
+        }
     }
 }

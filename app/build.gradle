@@ -17,6 +17,7 @@ keyProperties.load(new FileInputStream(rootProject.file("keystore.properties")))
 
 android {
     compileSdk 34
+    namespace 'com.pinslog.ww'
 
     defaultConfig {
         applicationId "com.pinslog.ww"
