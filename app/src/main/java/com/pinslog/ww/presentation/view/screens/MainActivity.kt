@@ -6,15 +6,16 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -26,9 +27,10 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,46 +41,88 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieClipSpec
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.rememberLottieAnimatable
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.google.firebase.dynamiclinks.DynamicLink
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
 import com.pinslog.ww.R
 import com.pinslog.ww.model.ForecastDO
 import com.pinslog.ww.presentation.model.CurrentWeather
 import com.pinslog.ww.presentation.model.HourlyForecast
+import com.pinslog.ww.presentation.model.Status
+import com.pinslog.ww.presentation.model.UiState
 import com.pinslog.ww.presentation.view.components.MinMaxToggleGroup
 import com.pinslog.ww.presentation.view.components.WearInfoItem
+import com.pinslog.ww.presentation.view.components.WwCard
 import com.pinslog.ww.presentation.view.components.WwTextHeadLine
 import com.pinslog.ww.presentation.view.components.WwTextLarge
 import com.pinslog.ww.presentation.view.components.WwTextMedium
+import com.pinslog.ww.presentation.view.components.WwTextSmall
 import com.pinslog.ww.presentation.view.screens.ui.theme.Blue1
+import com.pinslog.ww.presentation.view.screens.ui.theme.LightTextColor
 import com.pinslog.ww.presentation.view.screens.ui.theme.WWTheme
+import com.pinslog.ww.presentation.viewmodel.WeatherViewModel
 import com.pinslog.ww.util.Utility
 import com.pinslog.ww.util.noRippleClickable
+import dagger.hilt.android.AndroidEntryPoint
 
-private const val TAG = "ComposeTest"
+const val LOG_TAG = "ComposeTest"
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    private val weatherViewModel: WeatherViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        weatherViewModel.getCurrentLocation()
         setContent {
             CurrentSurface {
+                val forecastState by weatherViewModel.forecastWeather.collectAsState()
                 LazyColumn(
                     modifier = Modifier.padding(18.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
+
                     item {
-                        CurrentWeatherCard(currentWeather = sampleCurrentWeather) {
-                            createDynamicLink(sampleCurrentWeather)
+                        val currentWeatherState by weatherViewModel.currentWeatherStateFlow.collectAsState()
+
+                        when (currentWeatherState.status) {
+                            Status.LOADING, Status.SUCCESS -> {
+                                CurrentWeatherCard(currentWeatherState) {
+                                    currentWeatherState.data?.let {
+                                        createDynamicLink(it)
+                                    }
+                                }
+                            }
+
+                            Status.FAIL -> {}
+                            Status.ERROR -> {}
                         }
                     }
-                    items(sampleForecastList) {
-                        var isExpand by remember {
-                            mutableStateOf(false)
+
+                    when (forecastState.status) {
+                        Status.LOADING -> {}
+                        Status.SUCCESS -> {
+                            forecastState.data?.let { data ->
+                                items(data) { forecastDo ->
+                                    var isExpand by remember {
+                                        mutableStateOf(false)
+                                    }
+                                    forecastDo?.let {
+                                        ForecastItem(item = it, isExpand = isExpand) {
+                                            isExpand = !isExpand
+                                        }
+                                    }
+                                }
+                            }
                         }
-                        ForecastItem(item = it, isExpand = isExpand) {
-                            isExpand = !isExpand
-                        }
+
+                        Status.FAIL -> {}
+                        Status.ERROR -> {}
                     }
                 }
             }
@@ -193,45 +237,78 @@ fun CurrentSurface(content: @Composable () -> Unit) {
     }
 }
 
+/**
+ * 현재 날씨 레이아웃
+ *
+ * @param onShareButtonClick 공유하기 버튼 클릭 시 행위
+ */
 @Composable
-fun CurrentWeatherCard(currentWeather: CurrentWeather, onShareButtonClick: () -> Unit) {
+fun CurrentWeatherCard(
+    currentWeatherState: UiState<CurrentWeather>,
+    onShareButtonClick: () -> Unit
+) {
     var isExpand by remember {
         mutableStateOf(false)
     }
-    OutlinedCard {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.5f)
-                .padding(8.dp),
-            verticalArrangement = Arrangement.SpaceAround,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            WwTextHeadLine(text = currentWeather.currentLocation)
-            WwTextLarge(text = currentWeather.currentTime)
-            Image(
-                painterResource(id = R.drawable.ic_clear),
-                contentDescription = "날씨 이미지"
-            )
-            WwTextMedium(text = currentWeather.currentTemp)
-            WwTextMedium(text = currentWeather.weatherDescription)
-            Row(
+    val status = currentWeatherState.status
+    val composition by rememberLottieComposition(
+        LottieCompositionSpec.RawRes(R.raw.lottie_loading_ww)
+    )
+    val lottieAnimatable = rememberLottieAnimatable()
+    LaunchedEffect(composition) {
+        lottieAnimatable.animate(
+            composition = composition,
+            clipSpec = LottieClipSpec.Frame(0, 1200),
+            reverseOnRepeat = true,
+            initialProgress = 0f
+        )
+    }
+    currentWeatherState.data?.let { currentWeather ->
+        WwCard {
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.5f)
+                    .padding(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                CurrentWeatherButton(text = "오늘 뭐입지?", modifier = Modifier) {
-                    isExpand = !isExpand
+                WwTextHeadLine(text = currentWeather.currentLocation)
+                WwTextLarge(text = currentWeather.currentTime)
+                if (status == Status.LOADING) {
+                    LottieAnimation(
+                        composition = composition,
+                        progress = { lottieAnimatable.progress },
+                        modifier = Modifier.height(150.dp)
+                    )
+                } else if (status == Status.SUCCESS) {
+                    Image(
+                        painterResource(id = currentWeather.weatherIcon),
+                        contentDescription = "날씨 이미지"
+                    )
                 }
-                CurrentWeatherButton(text = "공유하기", modifier = Modifier) {
-                    onShareButtonClick()
+
+                WwTextMedium(text = "${currentWeather.currentTemp}°")
+                WwTextMedium(text = currentWeather.weatherDescription)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    CurrentWeatherButton(text = "오늘 뭐입지?", modifier = Modifier) {
+                        isExpand = !isExpand
+                    }
+                    CurrentWeatherButton(text = "공유하기", modifier = Modifier) {
+                        onShareButtonClick()
+                    }
                 }
-            }
-            if (isExpand) {
-                WearInfoItem(wearInfo = currentWeather.wearInfo, modifier = Modifier)
+                if (isExpand) {
+                    WearInfoItem(wearInfo = currentWeather.wearInfo, modifier = Modifier)
+                }
             }
         }
     }
+
 }
 
 /**
@@ -243,7 +320,7 @@ fun CurrentWeatherCard(currentWeather: CurrentWeather, onShareButtonClick: () ->
  */
 @Composable
 fun ForecastItem(item: ForecastDO, isExpand: Boolean, onClickForecastRow: () -> Unit) {
-    OutlinedCard {
+    WwCard {
         Column(
             modifier = Modifier
                 .padding(16.dp)
@@ -260,7 +337,7 @@ fun ForecastItem(item: ForecastDO, isExpand: Boolean, onClickForecastRow: () -> 
                 WwTextMedium(text = "${item.month}.${item.date}")
                 WwTextMedium(text = item.day)
                 Image(
-                    painterResource(id = R.drawable.ic_clear),
+                    painterResource(id = item.resourceId),
                     contentDescription = "날씨 이미지",
                     modifier = Modifier.size(30.dp),
                 )
@@ -308,14 +385,19 @@ fun ForecastItem(item: ForecastDO, isExpand: Boolean, onClickForecastRow: () -> 
                     // 최대/최소 기온 버튼
                     Row(
                         modifier = Modifier
-                            .fillMaxWidth()
+                            .height(IntrinsicSize.Max)
+                            .fillMaxHeight()
                             .padding(0.dp)
                     ) {
-                        Spacer(
+                        Row(
                             modifier = Modifier
-                                .weight(0.5f)
-                                .background(Color.Magenta)
-                        )
+                                .fillMaxHeight()
+                                .weight(0.5f),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            WwTextSmall(text = "비올 확률 : ${item.pop}%", textColor = LightTextColor)
+                        }
+
                         MinMaxToggleGroup(
                             items = listOf("max", "min"),
                             modifier = Modifier.weight(0.5f)
@@ -356,13 +438,18 @@ fun CurrentWeatherButton(
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
+    val sampleUiState = UiState<CurrentWeather>(
+        status = Status.LOADING,
+        message = "",
+        data = MainActivity.sampleCurrentWeather
+    )
     CurrentSurface {
         LazyColumn(
             modifier = Modifier.padding(18.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             item {
-                CurrentWeatherCard(currentWeather = MainActivity.sampleCurrentWeather) {
+                CurrentWeatherCard(sampleUiState) {
 
                 }
             }

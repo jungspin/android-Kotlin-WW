@@ -9,6 +9,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import okhttp3.ConnectionPool
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
@@ -38,9 +39,13 @@ class RetrofitModule {
     @Singleton
     @Provides
     fun getOkHttpClient():OkHttpClient {
+        val httpLoggingInterceptor = HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        }
         return OkHttpClient.Builder()
             .connectTimeout(3, TimeUnit.SECONDS)
             .connectionPool(ConnectionPool(5, 50, TimeUnit.SECONDS))
+            .addInterceptor(httpLoggingInterceptor)
             .build()
     }
 

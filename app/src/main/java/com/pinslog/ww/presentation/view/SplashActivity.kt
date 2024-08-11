@@ -14,7 +14,7 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
         return ActivitySplashBinding.inflate(inflater)
     }
 
-    override fun initSetting() {
+    override fun doNextAfterGranted() {
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
 

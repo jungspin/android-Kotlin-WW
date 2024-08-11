@@ -24,6 +24,7 @@ import com.pinslog.ww.presentation.model.CurrentWeather
 import com.pinslog.ww.presentation.model.HourlyForecast
 import com.pinslog.ww.presentation.model.Status
 import com.pinslog.ww.presentation.model.UiState
+import com.pinslog.ww.presentation.view.screens.LOG_TAG
 import com.pinslog.ww.util.CURRENT_TIME_PATTERN
 import com.pinslog.ww.util.Utility
 import com.pinslog.ww.util.toDate
@@ -110,6 +111,10 @@ class WeatherViewModel @Inject constructor(
                         loadWeatherData(location.latitude, location.longitude)
                     }
                 }
+                .addOnFailureListener {
+                    // TODO: 예외처리해두면 좋겠지
+                    Log.d(LOG_TAG, "getCurrentLocation: ${it.localizedMessage}")
+                }
         }
     }
 
@@ -121,8 +126,8 @@ class WeatherViewModel @Inject constructor(
      */
     private fun loadWeatherData(currentLocationLat: Double, currentLocationLon: Double) {
         val currentLocation = LatLng(currentLocationLat, currentLocationLon)
-        getCurrentWeatherLatLng(currentLocation.latitude, currentLocation.longitude)
-        getForecastLatLng(currentLocation.latitude, currentLocation.longitude)
+        getCurrentWeather(currentLocation.latitude, currentLocation.longitude)
+        getForecastWeather(currentLocation.latitude, currentLocation.longitude)
     }
 
     private val requestRequest = LocationRequest.create().apply {

@@ -1,11 +1,18 @@
 package com.pinslog.ww.presentation.view.components
 
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import com.pinslog.ww.presentation.view.screens.ui.theme.DefaultTextColor
+
+@Composable
+fun WwTextSmall(text: String, textColor: Color = DefaultTextColor) {
+    Text(text = text, color = textColor, style = MaterialTheme.typography.bodySmall)
+}
 
 @Composable
 fun WwTextMedium(text: String, textColor: Color = DefaultTextColor) {
@@ -29,4 +36,15 @@ fun WwTextHeadLine(text: String, textColor: Color = DefaultTextColor) {
         color = textColor,
         fontWeight = FontWeight.Bold
     )
+}
+
+@Composable
+fun WwCard(content: @Composable () -> Unit) {
+    OutlinedCard(
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        )
+    ) {
+        content()
+    }
 }
