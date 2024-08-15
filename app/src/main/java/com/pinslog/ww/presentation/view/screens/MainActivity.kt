@@ -9,6 +9,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -21,11 +22,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -41,6 +47,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieClipSpec
 import com.airbnb.lottie.compose.LottieCompositionSpec
@@ -76,32 +83,60 @@ class MainActivity : ComponentActivity() {
 
     private val weatherViewModel: WeatherViewModel by viewModels()
 
+    @OptIn(ExperimentalMaterialApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         weatherViewModel.getCurrentLocation()
         setContent {
             CurrentSurface {
                 val forecastState by weatherViewModel.forecastWeather.collectAsState()
+                var isRefreshing by remember {
+                    mutableStateOf(false)
+                }
+                val pullRefreshState = rememberPullRefreshState(
+                    refreshing = isRefreshing,
+                    onRefresh = {
+                        isRefreshing = true
+                        weatherViewModel.getCurrentLocation()
+                    }
+                )
+                val pullRefreshModifier = Modifier.pullRefresh(pullRefreshState)
+
                 LazyColumn(
-                    modifier = Modifier.padding(18.dp),
+                    modifier = pullRefreshModifier
+                        .padding(18.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
 
                     item {
                         val currentWeatherState by weatherViewModel.currentWeatherStateFlow.collectAsState()
 
-                        when (currentWeatherState.status) {
-                            Status.LOADING, Status.SUCCESS -> {
-                                CurrentWeatherCard(currentWeatherState) {
-                                    currentWeatherState.data?.let {
-                                        createDynamicLink(it)
+                        Box {
+                            // TODO: 커스텀 해보기
+                            PullRefreshIndicator(
+                                refreshing = isRefreshing,
+                                state = pullRefreshState,
+                                modifier = Modifier
+                                    .align(
+                                        Alignment.TopCenter
+                                    )
+                                    .zIndex(1f)
+                            )
+                            when (currentWeatherState.status) {
+                                Status.LOADING, Status.SUCCESS -> {
+                                    isRefreshing = false
+                                    CurrentWeatherCard(currentWeatherState) {
+                                        currentWeatherState.data?.let {
+                                            createDynamicLink(it)
+                                        }
                                     }
                                 }
-                            }
 
-                            Status.FAIL -> {}
-                            Status.ERROR -> {}
+                                Status.FAIL -> {}
+                                Status.ERROR -> {}
+                            }
                         }
+
                     }
 
                     when (forecastState.status) {
