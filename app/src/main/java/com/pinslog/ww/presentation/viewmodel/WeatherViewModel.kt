@@ -34,6 +34,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 import javax.inject.Inject
 
@@ -81,6 +84,12 @@ class WeatherViewModel @Inject constructor(
 
     @SuppressLint("MissingPermission")
     fun getCurrentLocation() {
+        // 개발 중 테스트 좌표
+        if (BuildConfig.BUILD_TYPE == "debug") {
+            loadWeatherData(35.173734, 129.128574)
+            return
+        }
+
         if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             // TODO: 위치 비활성화 상태 처리
         } else {
@@ -148,18 +157,22 @@ class WeatherViewModel @Inject constructor(
             val weatherIcon = Utility.setCodeToImg(weather.id)
             val weatherDescription = weather.description
 
-            val currentAddress = getCurrentAddress(lat, lng, geocoder)
-            currentMutableData.value = UiState(
-                status = Status.SUCCESS,
-                data = CurrentWeather(
-                    currentAddress,
-                    Utility.getRealTempAsString(currentTemp),
-                    currentTime,
-                    wearInfo,
-                    weatherIcon,
-                    weatherDescription
-                ),
-            )
+            viewModelScope.launch(Dispatchers.IO) {
+                val currentAddress = getCurrentAddress(lat, lng, geocoder)
+                withContext(Dispatchers.Main) {
+                    currentMutableData.value = UiState(
+                        status = Status.SUCCESS,
+                        data = CurrentWeather(
+                            currentAddress,
+                            Utility.getRealTempAsString(currentTemp),
+                            currentTime,
+                            wearInfo,
+                            weatherIcon,
+                            weatherDescription
+                        ),
+                    )
+                }
+            }
         }, {
             it.printStackTrace()
         })
@@ -402,22 +415,43 @@ class WeatherViewModel @Inject constructor(
      * @param lng 경도
      * @return 변환된 주소값
      */
-    private fun getCurrentAddress(lat: Double, lng: Double, geocoder: Geocoder): String {
-        var addressList: List<Address> = mutableListOf()
+    suspend fun getCurrentAddress(
+        lat: Double,
+        lng: Double,
+        geocoder: Geocoder
+    ): String {
+        val list = geocoder.reverse(lat, lng, 10)
+        val first = list.firstOrNull() ?: return ""
+        return first.toKoreanShort()
+    }
 
-        try {
-            addressList = geocoder.getFromLocation(lat, lng, 10)!!
-        } catch (e: Exception) {
-            // TODO: 처리 필요
-            e.printStackTrace()
+    @Suppress("DEPRECATION")
+    suspend fun Geocoder.reverse(
+        lat: Double,
+        lng: Double,
+        maxResults: Int = 5
+    ): List<Address> = kotlinx.coroutines.suspendCancellableCoroutine { cont ->
+        if (android.os.Build.VERSION.SDK_INT >= 33) {
+            getFromLocation(lat, lng, maxResults, object : Geocoder.GeocodeListener {
+                override fun onGeocode(addresses: MutableList<Address>) {
+                    if (cont.isActive) cont.resume(addresses) {}
+                }
+                override fun onError(errorMessage: String?) {
+                    if (cont.isActive) cont.resume(emptyList()) {}
+                }
+            })
+        } else {
+            val res = runCatching { getFromLocation(lat, lng, maxResults) ?: emptyList() }
+                .getOrDefault(emptyList())
+            cont.resume(res) {}
         }
+    }
 
-        if (addressList.isNotEmpty()) {
-            val addr = addressList[0].getAddressLine(0)
-            val addrParts = addr.split(" ")
-            return "${addrParts[2]} ${addrParts[3]}"
-        }
-        return ""
+    private fun Address.toKoreanShort(): String {
+        // 보통: locality(구/시) ↔ subAdminArea 대체, subLocality(동/읍/면), thoroughfare(도로명)
+        val gu = locality ?: subAdminArea
+        val dong = subLocality ?: thoroughfare ?: featureName
+        return listOfNotNull(gu, dong).joinToString(" ")
     }
 }
 
